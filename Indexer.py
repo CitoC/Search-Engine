@@ -1,3 +1,6 @@
+import json
+import nltk
+from nltk.tokenize import RegexpTokenizer
 
 class Index():
     def __init__(self):
@@ -6,11 +9,21 @@ class Index():
         self.token_id = {}          # associate each token with the document where it appears, e.g. {"anteater": [1], "zot": [1,4]}
                                     # this is a list of tuples
 
-    def extract_content():
-        # read from a json file
-        # extract content from json files
-        # return a list of words including stop words
-        return 0
+    # this function expects the name of a file as a string. it will attempt to open the file and 
+    # use the json library to extract the content attribute from the json file. Lastly, it will
+    # send the content of the file as a string to the tokenize function to have it return the list 
+    # of tokens. the list returned from tokenize is immediately returned by this function as well.
+    def extract_content(self, file: str) -> list:
+        try:
+            # read from a json file
+            with open(file, 'r') as f:
+                # extract content from json files
+                data = json.load(f)
+                
+                # return a list of words including stop words
+                return self.tokenize(data['content'])
+        except: 
+            print("Could not open JSON file..!")
 
     def assign_ID():
         # assign a url with a unique id
@@ -19,11 +32,14 @@ class Index():
         # doesn't return anything but modify the doc_id itself
         return 0
 
-    def tokenize():
+    # this function uses the nltk library to tokenize only the alphanumeric sequences within the 
+    # content string passed to it. this function returns a list with duplicate tokens 
+    def tokenize(self, content: str) -> list:
         # normalize the words to token, e.g. U.S.A to USA, etc.
-        # I think we are allowed to use a library
+        nltk = RegexpTokenizer(r'\w+')
+        
         # return a list of tokens
-        return 0
+        return nltk.tokenize(content)
 
     def stem():
         # stem the words, i.e., turns the tokens into their simplest form
