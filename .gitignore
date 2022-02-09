@@ -1,1 +1,3 @@
-/DEV
+# Ignore DEV folder which contains all the content of HTML pages
+# Reason: Too large
+DEV/*
