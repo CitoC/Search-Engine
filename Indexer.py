@@ -25,12 +25,22 @@ class Index():
         except: 
             print("Could not open JSON file..!")
 
-    def assign_ID():
+    def assign_ID(self, url):
         # assign a url with a unique id
         # add to the doc_id dictionary
         # example, {"https://ics.uci.edu": 1}
         # doesn't return anything but modify the doc_id itself
-        return 0
+
+        #checks to make sure that the url is not in the dictionary, if it is do nothing
+        #if it is not add it into the dictionary.
+        if url not in self.doc_id:
+
+            #Updates the dictionary with the url and assigns it an id
+            self.doc_id.update({url: self.current_id})
+            #Updates the current id
+            self.current_id = self.current_id + 1 
+       
+
 
     # this function uses the nltk library to tokenize only the alphanumeric sequences within the 
     # content string passed to it. this function returns a list with duplicate tokens 
@@ -41,19 +51,19 @@ class Index():
         # return a list of tokens
         return nltk.tokenize(content)
 
-    def stem():
+    def stem(self):
         # stem the words, i.e., turns the tokens into their simplest form
         # example, "swimming" to "swim"
         # return a list of stemmed tokens
         return 0
     
-    def create_pair_file():
+    def create_pair_file(self):
         # NOT SURE ABOUT THIS
         # write to a file each current_id
         # example, anteater 1\nzot 4\nzot 
         return 0
 
-    def create_index_file():
+    def create_index_file(self):
         # NOT SURE ABOUT THIS
         # create an index file using the file that is created by add_pair_to_file
         # go through every element in token_id and write to a file
