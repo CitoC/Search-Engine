@@ -1,6 +1,7 @@
 import json
-import nltk
-from nltk.tokenize import RegexpTokenizer
+from lib2to3.pgen2 import token
+from bs4 import BeautifulSoup
+import itertools
 
 class Index():
     def __init__(self):
@@ -12,7 +13,7 @@ class Index():
     # this function expects the name of a file as a string. it will attempt to open the file and 
     # use the json library to extract the content attribute from the json file. Lastly, it will
     # send the content of the file as a string to the tokenize function to have it return the list 
-    # of tokens. the list returned from tokenize is immediately returned by this function as well.
+    # of tokens. the list returned from tokenize     is immediately returned by this function as well.
     def extract_content(self, file: str) -> list:
         try:
             # read from a json file
@@ -40,16 +41,26 @@ class Index():
             #Updates the current id
             self.current_id = self.current_id + 1 
        
-
-
-    # this function uses the nltk library to tokenize only the alphanumeric sequences within the 
-    # content string passed to it. this function returns a list with duplicate tokens 
+    # this function uses BeautifulSoup to parse the content attribute of the JSON file.
+    # this function will return a 2D list of tokens; element 0 will contain a list of phrases
+    # that are considered important text and element 1 will contain individual words found
+    # within less important tags, such as <p> and <li>
     def tokenize(self, content: str) -> list:
-        # normalize the words to token, e.g. U.S.A to USA, etc.
-        nltk = RegexpTokenizer(r'\w+')
+        tokens = []
+
+        # create a BS object to parse content attribute from JSON file
+        soup = BeautifulSoup(content, "html.parser")
+
+        # the different tags we will use to parse text from each page's contents
+        important_tags = ['meta', 'b', 'strong', 'header', 'title', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6']
+        relevant_tags = ['p', 'li']
+        # <header> might not be a good idea... if we keep it, it will need to be 
+        # tokenized further to remove tabs and newlines
         
-        # return a list of tokens
-        return nltk.tokenize(content)
+        tokens.append(self.parse_tags(soup, important_tags))
+        tokens.append(self.parse_tags(soup, relevant_tags))
+
+        return tokens
 
     def stem(self):
         # stem the words, i.e., turns the tokens into their simplest form
@@ -68,3 +79,31 @@ class Index():
         # create an index file using the file that is created by add_pair_to_file
         # go through every element in token_id and write to a file
         return 0
+
+    def parse_tags(self, soup: BeautifulSoup, tag_list: list) -> list:
+        tokens = []
+
+        for tag in tag_list:
+            # find all of the following tags
+            results = soup.find_all(tag)
+            
+            # parse each result 
+            for result in results:
+                if tag == 'meta':
+                    # filter out only the important meta tags such as the page's description and author(s)
+                    if 'name' in result.attrs.keys() and (result.attrs['name'] == 'description' or result.attrs['name'] == 'author'):
+                        tokens.append(result.attrs['content'])
+                # split normal tags into separate words
+                elif tag == 'p' or tag == 'li':
+                    tokens.append(result.text.split()) 
+                # treat the entire "important text" phrase as a token
+                else:
+                    tokens.append(result.text)
+        
+        # since each result returns a list of tokens, the resulting token list becomes 2 dimensional.
+        # here we use itertools to merge the lists into a single large list of all the tokens found
+        # within the <p> and <li> tags
+        if tag_list[0] == 'p':
+            return list(itertools.chain.from_iterable(tokens))
+        else: # return the list of "important text" phrases
+            return tokens
