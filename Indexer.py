@@ -2,14 +2,31 @@ import json
 from lib2to3.pgen2 import token
 from bs4 import BeautifulSoup
 import itertools
+import os
 
 class Index():
     def __init__(self):
         self.doc_id = {}            # associate each url with an id, e.g. {"https://ics.uci.edu": 1, "https://reddit.com": 2}
         self.current_id = 1         # increment each time after an id is associated with a document
         self.token_id = {}          # associate each token with the document where it appears, e.g. {"anteater": [1], "zot": [1,4]}
-                                    # this is a list of tuples
+        self.tokens = []
+        
 
+    #This funcion will extract the data from the Dev folder containing all the content we will look at. 
+    def read_data(self):
+        #Dev is the folder containing all of our pages
+        #Might want to pass this value in instead to make it cleaner. 
+        directory = 'DEV'
+        #Gets all of the folders in the Dev folder
+        for strfile in os.scandir(directory):
+            #for each of the folders we will then go through them to get the json files
+            for root, dirs, files in os.walk(strfile.path):
+                #we will then extract the json content here
+                for file in files:
+                    #call extract content on the json here. 
+                    path_of_json = strfile.path + '/' + file
+                    
+                    #print( path_of_json)
     # this function expects the name of a file as a string. it will attempt to open the file and 
     # use the json library to extract the content attribute from the json file. Lastly, it will
     # send the content of the file as a string to the tokenize function to have it return the list 
