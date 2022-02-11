@@ -1,3 +1,4 @@
+from lib2to3.pgen2 import token
 from Indexer import Index
 
 def run():
@@ -7,17 +8,15 @@ def run():
     # this is just an example
     index = Index()
     
-    while (True):       
-        tokens = index.extract_content(test_json_file)
-        print("Important text:", tokens[0], '\n\nRelevant text:', tokens[1] )
-
-        # the extract_content function calls tokenize to tokenize the content it extracts
-        # index.tokenize() 
+    while (True):     
+        token_list = index.extract_content(test_json_file)
+        stem_list =index.stem(token_list)
         
-        index.stem()
-
         # once in a while, clear the memory and output those to a text file
+        
 
+        print(stem_list)
+        break
 
 
 
