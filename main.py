@@ -8,7 +8,7 @@ def run():
     # this is just an example
     index = Index()
     
-    while (True):       
+    while (True):     
         token_list = index.extract_content(test_json_file)
         stem_list =index.stem(token_list)
         
