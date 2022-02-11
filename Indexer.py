@@ -79,8 +79,7 @@ class Index():
         tokens.append(self.parse_tags(soup, important_tags))
         tokens.append(self.parse_tags(soup, relevant_tags))
 
-        # was returning a 2-d list. Only need the first element.
-        return tokens[0]
+        return tokens
 
     # this function takes a list to token and stem them, i.e., turns the tokens into their simplest form
     # example, "swimming" to "swim"
@@ -94,6 +93,7 @@ class Index():
         # NOT SURE ABOUT THIS
         # write to a file each current_id
         # example, anteater 1\nzot 4\nzot 
+        self.token_id{}
         return 0
 
     def create_index_file(self):
