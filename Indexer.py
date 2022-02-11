@@ -2,6 +2,7 @@ import json
 from lib2to3.pgen2 import token
 from bs4 import BeautifulSoup
 import itertools
+from nltk.stem import PorterStemmer
 
 class Index():
     def __init__(self):
@@ -10,10 +11,11 @@ class Index():
         self.token_id = {}          # associate each token with the document where it appears, e.g. {"anteater": [1], "zot": [1,4]}
                                     # this is a list of tuples
 
-    # this function expects the name of a file as a string. it will attempt to open the file and 
+    # This function expects the name of a file as a string. It will attempt to open the file and 
     # use the json library to extract the content attribute from the json file. Lastly, it will
     # send the content of the file as a string to the tokenize function to have it return the list 
-    # of tokens. the list returned from tokenize     is immediately returned by this function as well.
+    # of tokens. the list returned from tokenize is immediately returned by this function as well.
+    # Additionally, it will also call assign_ID()
     def extract_content(self, file: str) -> list:
         try:
             # read from a json file
@@ -21,24 +23,24 @@ class Index():
                 # extract content from json files
                 data = json.load(f)
                 
+                # assign url to an id
+                self.assign_ID(data['url'])
+
                 # return a list of words including stop words
                 return self.tokenize(data['content'])
         except: 
             print("Could not open JSON file..!")
 
-    def assign_ID(self, url):
-        # assign a url with a unique id
-        # add to the doc_id dictionary
-        # example, {"https://ics.uci.edu": 1}
-        # doesn't return anything but modify the doc_id itself
-
-        #checks to make sure that the url is not in the dictionary, if it is do nothing
-        #if it is not add it into the dictionary.
+    # This function is called by extract_content() only. It will assign the url to a unique id.
+    # The key/value pair is then added to doc_id dictionary.
+    # example, {"https://ics.uci.edu": 1}
+    def assign_ID(self, url: str):
+        # checks to make sure that the url is not in the dictionary, if it is do nothing
+        # if it is not add it into the dictionary.
         if url not in self.doc_id:
-
-            #Updates the dictionary with the url and assigns it an id
+            # Updates the dictionary with the url and assigns it an id
             self.doc_id.update({url: self.current_id})
-            #Updates the current id
+            # Updates the current id
             self.current_id = self.current_id + 1 
        
     # this function uses BeautifulSoup to parse the content attribute of the JSON file.
@@ -60,13 +62,16 @@ class Index():
         tokens.append(self.parse_tags(soup, important_tags))
         tokens.append(self.parse_tags(soup, relevant_tags))
 
-        return tokens
+        # was returning a 2-d list. Only need the first element.
+        return tokens[0]
 
-    def stem(self):
-        # stem the words, i.e., turns the tokens into their simplest form
-        # example, "swimming" to "swim"
-        # return a list of stemmed tokens
-        return 0
+    # this function takes a list to token and stem them, i.e., turns the tokens into their simplest form
+    # example, "swimming" to "swim"
+    # return a list of stemmed tokens
+    def stem(self, token_list: list) -> list:
+        ps = PorterStemmer()
+        stemmed_list = [ps.stem(token) for token in token_list]
+        return stemmed_list
     
     def create_pair_file(self):
         # NOT SURE ABOUT THIS
