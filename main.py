@@ -11,6 +11,8 @@ def run():
         index.extract_content(test_json_file)
         index.tokenize()
         index.stem()
+        #index.read_data()
+        break
 
         # once in a while, clear the memory and output those to a text file
 
