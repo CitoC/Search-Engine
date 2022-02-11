@@ -8,8 +8,12 @@ def run():
     index = Index()
     
     while (True):       
-        index.extract_content(test_json_file)
-        index.tokenize()
+        tokens = index.extract_content(test_json_file)
+        print("Important text:", tokens[0], '\n\nRelevant text:', tokens[1] )
+
+        # the extract_content function calls tokenize to tokenize the content it extracts
+        # index.tokenize() 
+        
         index.stem()
 
         # once in a while, clear the memory and output those to a text file

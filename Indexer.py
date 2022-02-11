@@ -2,6 +2,7 @@ import json
 from lib2to3.pgen2 import token
 from bs4 import BeautifulSoup
 import itertools
+import re
 
 class Index():
     def __init__(self):
@@ -20,11 +21,11 @@ class Index():
             with open(file, 'r') as f:
                 # extract content from json files
                 data = json.load(f)
-                
-                # return a list of words including stop words
-                return self.tokenize(data['content'])
         except: 
             print("Could not open JSON file..!")
+
+        # return a list of words including stop words
+        return self.tokenize(data['content'])
 
     def assign_ID(self, url):
         # assign a url with a unique id
@@ -54,11 +55,31 @@ class Index():
         # the different tags we will use to parse text from each page's contents
         important_tags = ['meta', 'b', 'strong', 'header', 'title', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6']
         relevant_tags = ['p', 'li']
-        # <header> might not be a good idea... if we keep it, it will need to be 
-        # tokenized further to remove tabs and newlines
         
         tokens.append(self.parse_tags(soup, important_tags))
         tokens.append(self.parse_tags(soup, relevant_tags))
+
+        # perform cleanup on our tokens
+        for i, list in enumerate(tokens):
+            for j, text in enumerate(list):
+
+                # first combinate any contractions by removing apostrophes
+                p = re.compile('[\']')
+                tokens[i][j] = p.sub('', text)
+
+                # then replace any character that isn't a number or letter with a space
+                p = re.compile('[^a-zA-Z0-9]')
+                tokens[i][j] = p.sub(' ', tokens[i][j])
+                
+                # lastly, remove any remaining extra spaces
+                tokens[i][j] = re.sub(' +', ' ', tokens[i][j])
+
+                # remove any leading and trailing spaces
+                tokens[i][j] = tokens[i][j].strip()
+
+                # remove any empty tokens
+                if len(tokens[i][j]) == 0:
+                    tokens[i].remove(tokens[i][j])
 
         return tokens
 
