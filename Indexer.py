@@ -2,6 +2,7 @@ import json
 from lib2to3.pgen2 import token
 from bs4 import BeautifulSoup
 import itertools
+import re
 from nltk.stem import PorterStemmer
 import os
 
@@ -39,14 +40,14 @@ class Index():
             with open(file, 'r') as f:
                 # extract content from json files
                 data = json.load(f)
-                
-                # assign url to an id
-                self.assign_ID(data['url'])
-
-                # return a list of words including stop words
-                return self.tokenize(data['content'])
         except: 
             print("Could not open JSON file..!")
+            
+        # assign url to an id
+        self.assign_ID(data['url'])
+
+        # return a list of words including stop words
+        return self.tokenize(data['content'])
 
     # This function is called by extract_content() only. It will assign the url to a unique id.
     # The key/value pair is then added to doc_id dictionary.
@@ -73,11 +74,31 @@ class Index():
         # the different tags we will use to parse text from each page's contents
         important_tags = ['meta', 'b', 'strong', 'header', 'title', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6']
         relevant_tags = ['p', 'li']
-        # <header> might not be a good idea... if we keep it, it will need to be 
-        # tokenized further to remove tabs and newlines
         
         tokens.append(self.parse_tags(soup, important_tags))
         tokens.append(self.parse_tags(soup, relevant_tags))
+
+        # perform cleanup on our tokens
+        for i, list in enumerate(tokens):
+            for j, text in enumerate(list):
+
+                # first combinate any contractions by removing apostrophes
+                p = re.compile('[\']')
+                tokens[i][j] = p.sub('', text)
+
+                # then replace any character that isn't a number or letter with a space
+                p = re.compile('[^a-zA-Z0-9]')
+                tokens[i][j] = p.sub(' ', tokens[i][j])
+                
+                # lastly, remove any remaining extra spaces
+                tokens[i][j] = re.sub(' +', ' ', tokens[i][j])
+
+                # remove any leading and trailing spaces
+                tokens[i][j] = tokens[i][j].strip()
+
+                # remove any empty tokens
+                if len(tokens[i][j]) == 0:
+                    tokens[i].remove(tokens[i][j])
 
         return tokens
 
@@ -89,12 +110,16 @@ class Index():
         stemmed_list = [ps.stem(token) for token in token_list]
         return stemmed_list
     
-    def create_pair_file(self):
+    def create_pair_file(self, token_list: list):
         # NOT SURE ABOUT THIS
         # write to a file each current_id
-        # example, anteater 1\nzot 4\nzot 
-        self.token_id{}
-        return 0
+        # example, anteater 1\nzot 4\nzot
+        for i,token in enumerate(token_list):
+            if token in self.token_id:
+                self.token_id[token_list[i]].append(self.current_id - 1)    # subtracting 1 is needed to get the correct document id, since curren_id is incremented by 1 in assign_ID
+            else:
+                self.token_id[token_list[i]] = [self.current_id - 1]        # 
+            return 0
 
     def create_index_file(self):
         # NOT SURE ABOUT THIS
