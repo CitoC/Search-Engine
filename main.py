@@ -1,25 +1,30 @@
 from lib2to3.pgen2 import token
 from Indexer import Index
+import os
 
 def run():
-    test_json_file = "8ef6d99d9f9264fc84514cdd2e680d35843785310331e1db4bbd06dd2b8eda9b.json"
-
     # a loop going over all the files in DEV need to happen here
     # this is just an example
     index = Index()
-    
-    while (True):     
-        token_list = index.extract_content(test_json_file)
-        stem_list = index.stem(token_list)
-        index.create_pair_file(token_list)
-        print(index.token_id)
-        # once in a while, clear the memory and output those to a text file
-        
+    # directory = 'DEV'
+    directory = 'DEV'
 
-        print(stem_list)
-        break
+    #Gets all of the folders in the Dev folder
+    #This will extract the data from the Dev folder containing all the content we will look at. 
+    for strfile in os.scandir(directory):
+        #for each of the folders we will then go through them to get the json files
+        for root, dirs, files in os.walk(strfile.path):
+            #we will then extract the json content here
+            for file in files:
+                #call extract content on the json here. 
+                path_of_json = strfile.path + '/' + file
+                # indexing starts here
+                token_list = index.extract_content(path_of_json)
+                stem_list = index.stem(token_list)
+                index.create_pair(stem_list)
 
-
+    # write to file
+    index.create_index()
 
 
 if __name__ == '__main__':

@@ -4,7 +4,6 @@ from bs4 import BeautifulSoup
 import itertools
 import re
 from nltk.stem import PorterStemmer
-import os
 
 class Index():
     def __init__(self):
@@ -12,23 +11,10 @@ class Index():
         self.current_id = 1         # increment each time after an id is associated with a document
         self.token_id = {}          # associate each token with the document where it appears, e.g. {"anteater": [1], "zot": [1,4]}
         self.tokens = []
+        self.occurences = {}
         
 
-    #This funcion will extract the data from the Dev folder containing all the content we will look at. 
-    def read_data(self):
-        #Dev is the folder containing all of our pages
-        #Might want to pass this value in instead to make it cleaner. 
-        directory = 'DEV'
-        #Gets all of the folders in the Dev folder
-        for strfile in os.scandir(directory):
-            #for each of the folders we will then go through them to get the json files
-            for root, dirs, files in os.walk(strfile.path):
-                #we will then extract the json content here
-                for file in files:
-                    #call extract content on the json here. 
-                    path_of_json = strfile.path + '/' + file
-                    
-                    #print( path_of_json)
+
     # this function expects the name of a file as a string. it will attempt to open the file and 
     # use the json library to extract the content attribute from the json file. Lastly, it will
     # send the content of the file as a string to the tokenize function to have it return the list 
@@ -77,13 +63,12 @@ class Index():
         
         tokens.append(self.parse_tags(soup, important_tags))
         tokens.append(self.parse_tags(soup, relevant_tags))
-
         # perform cleanup on our tokens
         for i, list in enumerate(tokens):
             for j, text in enumerate(list):
 
                 # first combinate any contractions by removing apostrophes
-                p = re.compile('[\']')
+                p = re.compile('[’\']')
                 tokens[i][j] = p.sub('', text)
 
                 # then replace any character that isn't a number or letter with a space
@@ -100,36 +85,45 @@ class Index():
                 if len(tokens[i][j]) == 0:
                     tokens[i].remove(tokens[i][j])
 
+                # either add a new token to the list, or increment its counter
+                if tokens[i][j].lower() in self.occurences.keys():
+                    self.occurences[tokens[i][j].lower()] += 1
+                else:
+                    self.occurences[tokens[i][j].lower()] = 1
+
+        # print(self.occurences)
         return tokens
 
     # this function takes a list to token and stem them, i.e., turns the tokens into their simplest form
     # example, "swimming" to "swim"
     # return a list of stemmed tokens
     def stem(self, token_list: list) -> list:
+        stemmed_list = []
         ps = PorterStemmer()
-        stemmed_list = [ps.stem(token) for token in token_list]
+        for lists in token_list:
+            for token in lists:
+                stemmed_list.append(ps.stem(token))
         return stemmed_list
     
-    def create_pair_file(self, token_list: list):
-        # NOT SURE ABOUT THIS
-        # write to a file each current_id
-        # example, anteater 1\nzot 4\nzot
-        for i,token in enumerate(token_list):
-            if token in self.token_id:
-                self.token_id[token_list[i]].append(self.current_id - 1)    # subtracting 1 is needed to get the correct document id, since curren_id is incremented by 1 in assign_ID
-            else:
-                self.token_id[token_list[i]] = [self.current_id - 1]        # 
-            return 0
 
-    def create_index_file(self):
-        # NOT SURE ABOUT THIS
-        # create an index file using the file that is created by add_pair_to_file
-        # go through every element in token_id and write to a file
-        return 0
+    def create_pair(self, stem_list: list):
+            for i,token in enumerate(stem_list):
+                if token in self.token_id:
+                    self.token_id[stem_list[i]].add(self.current_id - 1)    # subtracting 1 is needed to get the correct document id, since curren_id is incremented by 1 in assign_ID
+                else:
+                    self.token_id[stem_list[i]] = {self.current_id - 1}
+
+    def create_index(self):
+        with open('index.txt', 'w', encoding='utf-8') as file:
+            for token in self.token_id:
+                file.write(token + '\t')                       # print the key
+                for id in self.token_id[token]:         # print postings
+                    file.write(str(id) + ' ')
+                file.write('\n')
+
 
     def parse_tags(self, soup: BeautifulSoup, tag_list: list) -> list:
         tokens = []
-
         for tag in tag_list:
             # find all of the following tags
             results = soup.find_all(tag)
