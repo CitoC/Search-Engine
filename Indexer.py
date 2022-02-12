@@ -12,6 +12,7 @@ class Index():
         self.current_id = 1         # increment each time after an id is associated with a document
         self.token_id = {}          # associate each token with the document where it appears, e.g. {"anteater": [1], "zot": [1,4]}
         self.tokens = []
+        self.occurences = {}
         
 
     #This funcion will extract the data from the Dev folder containing all the content we will look at. 
@@ -29,6 +30,7 @@ class Index():
                     path_of_json = strfile.path + '/' + file
                     
                     #print( path_of_json)
+
     # this function expects the name of a file as a string. it will attempt to open the file and 
     # use the json library to extract the content attribute from the json file. Lastly, it will
     # send the content of the file as a string to the tokenize function to have it return the list 
@@ -77,13 +79,12 @@ class Index():
         
         tokens.append(self.parse_tags(soup, important_tags))
         tokens.append(self.parse_tags(soup, relevant_tags))
-
         # perform cleanup on our tokens
         for i, list in enumerate(tokens):
             for j, text in enumerate(list):
 
                 # first combinate any contractions by removing apostrophes
-                p = re.compile('[\']')
+                p = re.compile('[’\']')
                 tokens[i][j] = p.sub('', text)
 
                 # then replace any character that isn't a number or letter with a space
@@ -100,6 +101,13 @@ class Index():
                 if len(tokens[i][j]) == 0:
                     tokens[i].remove(tokens[i][j])
 
+                # either add a new token to the list, or increment its counter
+                if tokens[i][j].lower() in self.occurences.keys():
+                    self.occurences[tokens[i][j].lower()] += 1
+                else:
+                    self.occurences[tokens[i][j].lower()] = 1
+
+        print(self.occurences)
         return tokens
 
     # this function takes a list to token and stem them, i.e., turns the tokens into their simplest form
