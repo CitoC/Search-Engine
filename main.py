@@ -10,12 +10,12 @@ def run():
     
     while (True):     
         token_list = index.extract_content(test_json_file)
-        stem_list =index.stem(token_list)
+        # stem_list =index.stem(token_list)
         
         # once in a while, clear the memory and output those to a text file
         
 
-        print(stem_list)
+        #print(stem_list)
         break
 
 
