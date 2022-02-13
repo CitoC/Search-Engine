@@ -86,10 +86,10 @@ class Index():
                     tokens[i].remove(tokens[i][j])
 
                 # either add a new token to the list, or increment its counter
-                if tokens[i][j].lower() in self.occurences.keys():
-                    self.occurences[tokens[i][j].lower()] += 1
-                else:
-                    self.occurences[tokens[i][j].lower()] = 1
+                # if tokens[i][j].lower() in self.occurences.keys():
+                #     self.occurences[tokens[i][j].lower()] += 1
+                # else:
+                #     self.occurences[tokens[i][j].lower()] = 1
 
         # print(self.occurences)
         return tokens
@@ -133,7 +133,8 @@ class Index():
                 if tag == 'meta':
                     # filter out only the important meta tags such as the page's description and author(s)
                     if 'name' in result.attrs.keys() and (result.attrs['name'] == 'description' or result.attrs['name'] == 'author'):
-                        tokens.append(result.attrs['content'])
+                        if 'content' in result.attrs.keys():
+                            tokens.append(result.attrs['content'])
                 # split normal tags into separate words
                 elif tag == 'p' or tag == 'li':
                     tokens.append(result.text.split()) 

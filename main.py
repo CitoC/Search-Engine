@@ -14,8 +14,10 @@ def run():
     for strfile in os.scandir(directory):
         #for each of the folders we will then go through them to get the json files
         for root, dirs, files in os.walk(strfile.path):
+            print(strfile.path)
             #we will then extract the json content here
             for file in files:
+                print(file)
                 #call extract content on the json here. 
                 path_of_json = strfile.path + '/' + file
                 # indexing starts here
