@@ -6,8 +6,7 @@ def run():
     # a loop going over all the files in DEV need to happen here
     # this is just an example
     index = Index()
-    # directory = 'DEV'
-    directory = 'DEV'
+    directory = 'testdir'
 
     #Gets all of the folders in the Dev folder
     #This will extract the data from the Dev folder containing all the content we will look at. 
@@ -24,10 +23,7 @@ def run():
                 token_list = index.extract_content(path_of_json)
                 stem_list = index.stem(token_list)
                 index.create_pair(stem_list)
-
-    # write to file
-    index.create_index()
-
+            index.create_index()
 
 if __name__ == '__main__':
     run()

@@ -12,7 +12,7 @@ class Index():
         self.token_id = {}          # associate each token with the document where it appears, e.g. {"anteater": [1], "zot": [1,4]}
         self.tokens = []
         self.occurences = {}
-        
+        self.file_num = 0
 
 
     # this function expects the name of a file as a string. it will attempt to open the file and 
@@ -114,12 +114,19 @@ class Index():
                     self.token_id[stem_list[i]] = {self.current_id - 1}
 
     def create_index(self):
-        with open('index.txt', 'w', encoding='utf-8') as file:
+        tName = './indexes/index'
+        fName = '%s%d.txt' % (tName, self.file_num)
+        with open(fName, 'w', encoding='utf-8') as file:
             for token in self.token_id:
                 file.write(token + '\t')                       # print the key
                 for id in self.token_id[token]:         # print postings
                     file.write(str(id) + ' ')
                 file.write('\n')
+        
+        # increment file number
+        self.file_num += 1
+        # empty 
+        self.token_id = {}
 
 
     def parse_tags(self, soup: BeautifulSoup, tag_list: list) -> list:
