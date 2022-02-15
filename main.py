@@ -6,7 +6,7 @@ def run():
     # a loop going over all the files in DEV need to happen here
     # this is just an example
     index = Index()
-    directory = 'testdir'
+    directory = 'DEV'
 
     #Gets all of the folders in the Dev folder
     #This will extract the data from the Dev folder containing all the content we will look at. 
