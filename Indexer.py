@@ -1,5 +1,6 @@
 import json
 from lib2to3.pgen2 import token
+import string
 from bs4 import BeautifulSoup
 import itertools
 import re
@@ -61,11 +62,12 @@ class Index():
         important_tags = ['meta', 'b', 'strong', 'header', 'title', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6']
         relevant_tags = ['p', 'li']
         
-        tokens.append(self.parse_tags(soup, important_tags))
-        tokens.append(self.parse_tags(soup, relevant_tags))
+        #Turns the returned sets into lists to process them
+        tokens.append(list(self.parse_tags(soup, important_tags)))
+        tokens.append(list(self.parse_tags(soup, relevant_tags)))
         # perform cleanup on our tokens
-        for i, list in enumerate(tokens):
-            for j, text in enumerate(list):
+        for i, l in enumerate(tokens):
+            for j, text in enumerate(l):
 
                 # first combinate any contractions by removing apostrophes
                 p = re.compile('[’\']')
@@ -129,7 +131,7 @@ class Index():
         self.token_id = {}
 
 
-    def parse_tags(self, soup: BeautifulSoup, tag_list: list) -> list:
+    def parse_tags(self, soup: BeautifulSoup, tag_list: list) -> set:
         tokens = []
         for tag in tag_list:
             # find all of the following tags
@@ -153,6 +155,33 @@ class Index():
         # here we use itertools to merge the lists into a single large list of all the tokens found
         # within the <p> and <li> tags
         if tag_list[0] == 'p':
-            return list(itertools.chain.from_iterable(tokens))
+            #returns as a set to get rid of duplicate tokens before processing them
+            return set(itertools.chain.from_iterable(tokens))
         else: # return the list of "important text" phrases
-            return tokens
+            #returns as a set to get rid of duplicate tokens before processing them 
+            return set(tokens)
+
+    #This function will read in the input and tokenize the input for retrieval
+    #of the document in the index
+    #Only need to test the querys (cristina lopes, machine learning, ACM, master of software engineering)
+    def get_input(self, input:string):
+        pass
+
+    #this function will go through the index and retrieve the relevant 
+    #documents releated to the query
+    #the majority of milestone 2 will probably be involved here(might need more functions to help the processing)
+    # returns a list of the relevent documents to compare
+    def retrieve_relevant_document(self):
+        pass
+
+    #this function will load in one of the index files into the index in memory
+    def load_index_from_file(self):
+        pass
+
+    #this function will clear the index
+    def clear_index(self):
+        pass
+    
+    #this function will output the most relevant document to the console
+    def output_document(self):
+        pass
