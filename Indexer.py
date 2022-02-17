@@ -12,7 +12,7 @@ class Index():
         self.current_id = 1         # increment each time after an id is associated with a document
         self.token_id = {}          # associate each token with the document where it appears, e.g. {"anteater": [1], "zot": [1,4]}
         self.tokens = []
-        self.occurences = {}
+        self.occurrences = {}
         self.file_num = 0
 
 
@@ -63,37 +63,10 @@ class Index():
         relevant_tags = ['p', 'li']
         
         #Turns the returned sets into lists to process them
-        tokens.append(list(self.parse_tags(soup, important_tags)))
-        tokens.append(list(self.parse_tags(soup, relevant_tags)))
-        # perform cleanup on our tokens
-        for i, l in enumerate(tokens):
-            for j, text in enumerate(l):
+        tokens.append(self.parse_tags(soup, important_tags))
+        tokens.append(self.parse_tags(soup, relevant_tags))
 
-                # first combinate any contractions by removing apostrophes
-                p = re.compile('[’\']')
-                tokens[i][j] = p.sub('', text)
-
-                # then replace any character that isn't a number or letter with a space
-                p = re.compile('[^a-zA-Z0-9]')
-                tokens[i][j] = p.sub(' ', tokens[i][j])
-                
-                # lastly, remove any remaining extra spaces
-                tokens[i][j] = re.sub(' +', ' ', tokens[i][j])
-
-                # remove any leading and trailing spaces
-                tokens[i][j] = tokens[i][j].strip()
-
-                # remove any empty tokens
-                if len(tokens[i][j]) == 0:
-                    tokens[i].remove(tokens[i][j])
-
-                # either add a new token to the list, or increment its counter
-                # if tokens[i][j].lower() in self.occurences.keys():
-                #     self.occurences[tokens[i][j].lower()] += 1
-                # else:
-                #     self.occurences[tokens[i][j].lower()] = 1
-
-        # print(self.occurences)
+        # print(self.occurrences)
         return tokens
 
     # this function takes a list to token and stem them, i.e., turns the tokens into their simplest form
@@ -130,36 +103,68 @@ class Index():
         # empty 
         self.token_id = {}
 
-
     def parse_tags(self, soup: BeautifulSoup, tag_list: list) -> set:
         tokens = []
+
         for tag in tag_list:
             # find all of the following tags
             results = soup.find_all(tag)
             
             # parse each result 
             for result in results:
+
+                # this list will temporarily store the tokens found in the current result from the
+                # soup.find_all function call to be checked against a frequency map and added to
+                # a tokens set
+                temp_tokens = []
+
                 if tag == 'meta':
                     # filter out only the important meta tags such as the page's description and author(s)
                     if 'name' in result.attrs.keys() and (result.attrs['name'] == 'description' or result.attrs['name'] == 'author'):
                         if 'content' in result.attrs.keys():
-                            tokens.append(result.attrs['content'])
+                            temp_tokens.append(result.attrs['content'])
                 # split normal tags into separate words
                 elif tag == 'p' or tag == 'li':
-                    tokens.append(result.text.split()) 
+                    temp_tokens = result.text.split()
                 # treat the entire "important text" phrase as a token
                 else:
-                    tokens.append(result.text)
-        
-        # since each result returns a list of tokens, the resulting token list becomes 2 dimensional.
-        # here we use itertools to merge the lists into a single large list of all the tokens found
-        # within the <p> and <li> tags
-        if tag_list[0] == 'p':
-            #returns as a set to get rid of duplicate tokens before processing them
-            return set(itertools.chain.from_iterable(tokens))
-        else: # return the list of "important text" phrases
-            #returns as a set to get rid of duplicate tokens before processing them 
-            return set(tokens)
+                    temp_tokens.append(result.text)
+
+                # perform cleanup on our tokens
+                temp_tokens = self.token_clean_up(temp_tokens)
+
+                for t in temp_tokens:
+                    # either add a new token to the list, or increment its counter
+                    if t.lower() in self.occurrences.keys():
+                        self.occurrences[t.lower()] += 1
+                    else:
+                        self.occurrences[t.lower()] = 1
+                        tokens.append(t)
+                        
+        return tokens      
+
+    # this function will aid in clean-up of tokens by removing any non-alphanumeric characters
+    def token_clean_up(self, tokens):
+        for i, text in enumerate(tokens):
+            # first combinate any contractions by removing apostrophes
+            p = re.compile('[’\']')
+            tokens[i] = p.sub('', text)
+
+            # then replace any character that isn't a number or letter with a space
+            p = re.compile('[^a-zA-Z0-9]')
+            tokens[i] = p.sub(' ', tokens[i])
+            
+            # lastly, remove any remaining extra spaces
+            tokens[i] = re.sub(' +', ' ', tokens[i])
+
+            # remove any leading and trailing spaces
+            tokens[i] = tokens[i].strip()
+
+            # remove any empty tokens
+            if len(tokens[i]) == 0:
+                tokens.remove(tokens[i])
+
+        return tokens
 
     #This function will read in the input and tokenize the input for retrieval
     #of the document in the index
