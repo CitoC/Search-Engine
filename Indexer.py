@@ -44,7 +44,7 @@ class Index():
         # if it is not add it into the dictionary.
         if url not in self.doc_id:
             # Updates the dictionary with the url and assigns it an id
-            self.doc_id.update({url: self.current_id})
+            self.doc_id.update({self.current_id: url})
             # Updates the current id
             self.current_id = self.current_id + 1 
        
