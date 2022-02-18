@@ -88,7 +88,7 @@ class Index():
             else:
                 self.token_id[stem_list[i]] = {self.current_id - 1}
 
-    def create_index(self):
+    def create_index(self) -> str:
         tName = './indexes/index'
         fName = '%s%d.txt' % (tName, self.file_num)
         with open(fName, 'w', encoding='utf-8') as file:
@@ -102,6 +102,9 @@ class Index():
         self.file_num += 1
         # empty 
         self.token_id = {}
+
+        # return the file name for sorting of file
+        return fName
 
     def parse_tags(self, soup: BeautifulSoup, tag_list: list, occurrences: dict) -> set:
         tokens = []
@@ -148,21 +151,28 @@ class Index():
         for i, text in enumerate(tokens):
             # first combinate any contractions by removing apostrophes
             p = re.compile('[’\']')
-            tokens[i] = p.sub('', text)
+            tokens[i] = p.sub('', tokens[i])
 
             # then replace any character that isn't a number or letter with a space
             p = re.compile('[^a-zA-Z0-9]')
             tokens[i] = p.sub(' ', tokens[i])
             
+            p = re.compile(' +')
             # lastly, remove any remaining extra spaces
-            tokens[i] = re.sub(' +', ' ', tokens[i])
+            tokens[i] = p.sub(' ', tokens[i])
 
             # remove any leading and trailing spaces
             tokens[i] = tokens[i].strip()
 
-            # remove any empty tokens
-            if len(tokens[i]) == 0:
-                tokens.remove(tokens[i])
+        # delete empty tokens
+        tokens = list(filter(None, tokens))
+
+        # TESTING:
+        for token in tokens:
+            for char in token:
+                if not (char.isalnum() or char == ' '):
+                    print('ERROR:', token)
+                    break
 
         return tokens
 
