@@ -59,7 +59,7 @@ def run():
                 index.create_pair(stem_list)
             
                 # check to see if we've hit the ram usage threshold, if so, create an offload a partial index
-                previous_memory_usage = handle_ram_threshold(previous_memory_usage, index, token_list, stem_list)
+                previous_memory_usage = handle_ram_threshold(previous_memory_usage, threshold_offset, index, token_list, stem_list)
            
     # create one last index by passing in a value that guarantees that the condition for creating a 
     # partial index is met
