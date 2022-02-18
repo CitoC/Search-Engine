@@ -6,6 +6,7 @@ import itertools
 import re
 from nltk.stem import PorterStemmer
 
+
 class Index():
     def __init__(self):
         self.doc_id = {}            # associate each url with an id, e.g. {"https://ics.uci.edu": 1, "https://reddit.com": 2}
@@ -90,14 +91,23 @@ class Index():
 
     def create_index(self):
         tName = './indexes/index'
-        fName = '%s%d.txt' % (tName, self.file_num)
+        fName = '%s%d.json' % (tName, self.file_num)
         with open(fName, 'w', encoding='utf-8') as file:
             for token in self.token_id:
-                file.write(token + '\t')                       # print the key
-                for id in self.token_id[token]:         # print postings
-                    file.write(str(id) + ' ')
-                file.write('\n')
-        
+                #converts the set that was in the map into a list so that it can be
+                #converted to json for the dump 
+                #note: set cannot be converted to json
+                new_value = list(self.token_id[token])
+                self.token_id.update({token: new_value})
+               
+                # file.write(token + '\t')                       # print the key
+                # for id in self.token_id[token]:         # print postings
+                #     file.write(str(id) + ' ')
+                # file.write('\n')
+                
+            #dumps the map with json into a file
+            json.dump(self.token_id, file)
+           
         # increment file number
         self.file_num += 1
         # empty 
@@ -166,22 +176,18 @@ class Index():
 
         return tokens
 
-    #This function will read in the input and tokenize the input for retrieval
-    #of the document in the index
-    #Only need to test the querys (cristina lopes, machine learning, ACM, master of software engineering)
-    def get_input(self, input:string):
-        pass
-
-    #this function will go through the index and retrieve the relevant 
-    #documents releated to the query
-    #the majority of milestone 2 will probably be involved here(might need more functions to help the processing)
-    # returns a list of the relevent documents to compare
-    def retrieve_relevant_document(self):
-        pass
-
+    
     #this function will load in one of the index files into the index in memory
-    def load_index_from_file(self):
-        pass
+    def load_index_from_file(self, file):
+        try:
+            # read from a json file
+            with open(file, 'r') as f:
+                # loads the data from one of the indexes
+                data = json.load(f)
+                #Loads the data into memory
+                self.token_id = data
+        except: 
+            print("Could not open JSON file..!")
 
     #this function will clear the index
     def clear_index(self):
