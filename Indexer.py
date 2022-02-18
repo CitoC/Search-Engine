@@ -12,7 +12,6 @@ class Index():
         self.current_id = 1         # increment each time after an id is associated with a document
         self.token_id = {}          # associate each token with the document where it appears, e.g. {"anteater": [1], "zot": [1,4]}
         self.tokens = []
-        self.occurrences = {}
         self.file_num = 0
 
 
@@ -54,6 +53,7 @@ class Index():
     # within less important tags, such as <p> and <li>
     def tokenize(self, content: str) -> list:
         tokens = []
+        occurrences = {}
 
         # create a BS object to parse content attribute from JSON file
         soup = BeautifulSoup(content, "html.parser")
@@ -63,8 +63,8 @@ class Index():
         relevant_tags = ['p', 'li']
         
         #Turns the returned sets into lists to process them
-        tokens.append(self.parse_tags(soup, important_tags))
-        tokens.append(self.parse_tags(soup, relevant_tags))
+        tokens.append(self.parse_tags(soup, important_tags, occurrences))
+        tokens.append(self.parse_tags(soup, relevant_tags, occurrences))
 
         # print(self.occurrences)
         return tokens
@@ -82,11 +82,11 @@ class Index():
     
 
     def create_pair(self, stem_list: list):
-            for i,token in enumerate(stem_list):
-                if token in self.token_id:
-                    self.token_id[stem_list[i]].add(self.current_id - 1)    # subtracting 1 is needed to get the correct document id, since curren_id is incremented by 1 in assign_ID
-                else:
-                    self.token_id[stem_list[i]] = {self.current_id - 1}
+        for i,token in enumerate(stem_list):
+            if token in self.token_id:
+                self.token_id[stem_list[i]].add(self.current_id - 1)    # subtracting 1 is needed to get the correct document id, since curren_id is incremented by 1 in assign_ID
+            else:
+                self.token_id[stem_list[i]] = {self.current_id - 1}
 
     def create_index(self):
         tName = './indexes/index'
@@ -103,7 +103,7 @@ class Index():
         # empty 
         self.token_id = {}
 
-    def parse_tags(self, soup: BeautifulSoup, tag_list: list) -> set:
+    def parse_tags(self, soup: BeautifulSoup, tag_list: list, occurrences: dict) -> set:
         tokens = []
 
         for tag in tag_list:
@@ -135,10 +135,10 @@ class Index():
 
                 for t in temp_tokens:
                     # either add a new token to the list, or increment its counter
-                    if t.lower() in self.occurrences.keys():
-                        self.occurrences[t.lower()] += 1
+                    if t.lower() in occurrences.keys():
+                        occurrences[t.lower()] += 1
                     else:
-                        self.occurrences[t.lower()] = 1
+                        occurrences[t.lower()] = 1
                         tokens.append(t)
                         
         return tokens      
