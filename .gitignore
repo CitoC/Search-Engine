@@ -4,3 +4,7 @@ DEV/*
 
 # Folder contains smaller files for testing purpose
 testdir/*
+
+indexes/*
+
+test.py

@@ -10,7 +10,7 @@ class Index():
     def __init__(self):
         self.doc_id = {}            # associate each url with an id, e.g. {"https://ics.uci.edu": 1, "https://reddit.com": 2}
         self.current_id = 1         # increment each time after an id is associated with a document
-        self.token_id = {}          # associate each token with the document where it appears, e.g. {"anteater": [1], "zot": [1,4]}
+        self.token_posting = {}          # associate each token with the document where it appears, e.g. {"anteater": [1], "zot": [1,4]}
         self.tokens = []
         self.occurrences = {}
         self.file_num = 0
@@ -69,6 +69,7 @@ class Index():
         # print(self.occurrences)
         return tokens
 
+
     # this function takes a list to token and stem them, i.e., turns the tokens into their simplest form
     # example, "swimming" to "swim"
     # return a list of stemmed tokens
@@ -80,20 +81,26 @@ class Index():
                 stemmed_list.append(ps.stem(token))
         return stemmed_list
     
-
-    def create_pair(self, stem_list: list):
-            for i,token in enumerate(stem_list):
-                if token in self.token_id:
-                    self.token_id[stem_list[i]].add(self.current_id - 1)    # subtracting 1 is needed to get the correct document id, since curren_id is incremented by 1 in assign_ID
+    # create posting for the token
+    # example, {“anteater”: [(1,3),(5,2)], “zot”: [(3,6)]}
+    def create_posting(self, stem_list: list):
+            id = self.current_id - 1
+            print("INSIDE CREATE_POSTING: " + str(id))
+            for i,stem_t in enumerate(stem_list):
+                # if stemmed token already in token_posting
+                if stem_t in self.token_posting:
+                    print("here!!!!!!!!!!!!!!!!!!!!!!!!!!!")
+                    self.token_posting[stem_t].append(tuple([id, self.occurrences]))     # subtracting 1 is needed to get the correct document id, since curren_id is incremented by 1 in assign_ID
                 else:
-                    self.token_id[stem_list[i]] = {self.current_id - 1}
+                    self.token_posting[stem_t] = [tuple([id, self.occurrences[stem_t]])]
+
 
     def create_index(self):
         tName = './indexes/index'
         fName = '%s%d.txt' % (tName, self.file_num)
         with open(fName, 'w', encoding='utf-8') as file:
             for token in self.token_id:
-                file.write(token + '\t')                       # print the key
+                file.write(token + '\t')                # print the key
                 for id in self.token_id[token]:         # print postings
                     file.write(str(id) + ' ')
                 file.write('\n')
@@ -132,13 +139,14 @@ class Index():
 
                 # perform cleanup on our tokens
                 temp_tokens = self.token_clean_up(temp_tokens)
-
+                ps = PorterStemmer()                # imported stemmer to let occurences contain stemmed tokens
                 for t in temp_tokens:
                     # either add a new token to the list, or increment its counter
-                    if t.lower() in self.occurrences.keys():
-                        self.occurrences[t.lower()] += 1
+                    stem_t = ps.stem(t)
+                    if stem_t in self.occurrences.keys():
+                        self.occurrences[stem_t.lower()] += 1
                     else:
-                        self.occurrences[t.lower()] = 1
+                        self.occurrences[stem_t.lower()] = 1
                         tokens.append(t)
                         
         return tokens      
