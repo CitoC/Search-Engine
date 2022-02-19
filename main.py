@@ -12,7 +12,7 @@ import subprocess
 # this function will either return the previous_memory_usage that it received if the threshold wasn't met, or
 # if a partial index is made, then it will set the previous_memory_usage to the new threshold that it just met
 # (to set a new threshold for the next partial index)
-def handle_ram_threshold(previous_memory_usage: float, threshold_offset: int, index: Index, token_list: list, stem_list: list) -> float:
+def handle_ram_threshold(previous_memory_usage: float, threshold_offset: int, index: Index, token_list: list) -> float:
     # when we hit the RAM threshold
     if psutil.virtual_memory()[2] > previous_memory_usage + threshold_offset:
         # set a new previous 
@@ -29,17 +29,17 @@ def handle_ram_threshold(previous_memory_usage: float, threshold_offset: int, in
         # try to delete as much from memory as possible
         del index
         del token_list
-        del stem_list
 
         # create a new partial index
         index = Index()
 
     return previous_memory_usage
 
-
 def run():
     index = Index()
-    directory = 'testdir'
+    directory = 'DEV'
+    threshold_offset = 5
+    previous_memory_usage = psutil.virtual_memory()[2]
 
     #Gets all of the folders in the Dev folder
     #This will extract the data from the Dev folder containing all the content we will look at. 
@@ -54,9 +54,12 @@ def run():
                 # indexing starts here
                 token_list = index.extract_content(path_of_json)
                 index.create_posting(token_list)
-                del token_list
-        
+
+                # after each file, check if the RAM threshold has been reached
+                #handle_ram_threshold(previous_memory_usage, threshold_offset, index, token_list)
+            handle_ram_threshold(previous_memory_usage, -threshold_offset, index, token_list)  
+
+    handle_ram_threshold(previous_memory_usage, -threshold_offset, index, token_list)       
         
 if __name__ == '__main__':
     run()
-
