@@ -10,9 +10,10 @@ class Index():
     def __init__(self):
         self.doc_id = {}            # associate each url with an id, e.g. {"https://ics.uci.edu": 1, "https://reddit.com": 2}
         self.current_id = 1         # increment each time after an id is associated with a document
-        self.token_posting = {}          # associate each token with the document where it appears, e.g. {"anteater": [1], "zot": [1,4]}
+        self.token_posting = {}     # associate each token with the document where it appears, e.g. {"anteater": [(1,3),(5,2)], "zot": [(1,4)]}
         self.tokens = []
         self.file_num = 0
+        self.occurrences = {}
 
 
     # this function expects the name of a file as a string. it will attempt to open the file and 
@@ -53,7 +54,7 @@ class Index():
     # within less important tags, such as <p> and <li>
     def tokenize(self, content: str) -> list:
         tokens = []
-        occurrences = {}
+        self.occurrences = {}        # reset the occurences dictionary
 
         # create a BS object to parse content attribute from JSON file
         soup = BeautifulSoup(content, "html.parser")
@@ -63,16 +64,16 @@ class Index():
         relevant_tags = ['p', 'li']
         
         #Turns the returned sets into lists to process them
-        tokens.append(self.parse_tags(soup, important_tags, occurrences))
-        tokens.append(self.parse_tags(soup, relevant_tags, occurrences))
+        tokens.append(self.parse_tags(soup, important_tags))
+        tokens.append(self.parse_tags(soup, relevant_tags))
 
         # print(self.occurrences)
-        return tokens, occurrences
-
+        return tokens
 
     # this function takes a list to token and stem them, i.e., turns the tokens into their simplest form
     # example, "swimming" to "swim"
     # return a list of stemmed tokens
+    ''' # DEFUNT #
     def stem(self, token_list: list) -> list:
         stemmed_list = []
         ps = PorterStemmer()
@@ -80,22 +81,23 @@ class Index():
             for token in lists:
                 stemmed_list.append(ps.stem(token))
         return stemmed_list
-    
+    ''' 
     # create posting for the token
     # example, {“anteater”: [(1,3),(5,2)], “zot”: [(3,6)]}
-    def create_posting(self, stem_list: list, occurences: dict):
+    def create_posting(self, token_list: list):
             id = self.current_id - 1
             print("INSIDE CREATE_POSTING: " + str(id))
-            for i,stem_t in enumerate(stem_list):
-                # if stemmed token already in token_posting
-                if stem_t in self.token_posting:
-                    print("here!!!!!!!!!!!!!!!!!!!!!!!!!!!")
-                    self.token_posting[stem_t].append(tuple([id, occurences[stem_t]]))     # subtracting 1 is needed to get the correct document id, since curren_id is incremented by 1 in assign_ID
-                else:
-                    self.token_posting[stem_t] = [tuple([id, occurences[stem_t]])]
+            # REMINDER: mixing important list and normal list. Fix later
+            for l in token_list:
+                for token in l:
+                    # if token is already in the posting
+                    if token in self.token_posting.keys():
+                        self.token_posting[token].append(tuple([id, self.occurrences[token]])) # subtracting 1 is needed to get the correct document id, since curren_id is incremented by 1 in assign_ID
+                    else:
+                        self.token_posting[token] = [tuple([id, self.occurrences[token]])]
 
 
-    def create_index(self):
+    def create_index(self) -> str:
         tName = './indexes/index'
         fName = '%s%d.txt' % (tName, self.file_num)
         with open(fName, 'w', encoding='utf-8') as file:
@@ -110,7 +112,10 @@ class Index():
         # empty 
         self.token_id = {}
 
-    def parse_tags(self, soup: BeautifulSoup, tag_list: list, occurrences: dict) -> set:
+        # return the file name for sorting of file
+        return fName
+
+    def parse_tags(self, soup: BeautifulSoup, tag_list: list,) -> set:
         tokens = []
 
         for tag in tag_list:
@@ -140,17 +145,15 @@ class Index():
                 # perform cleanup on our tokens
                 temp_tokens = self.token_clean_up(temp_tokens)
                 ps = PorterStemmer()                # imported stemmer to let occurences contain stemmed tokens
-                for t in temp_tokens:
+                stem_tokens = [ps.stem(t) for t in temp_tokens]
+                for t in stem_tokens:
                     # either add a new token to the list, or increment its counter
-                    stem_t = ps.stem(t)
-                    if stem_t.lower() in occurrences.keys():
-                        occurrences[stem_t.lower()] += 1
+                    if t in self.occurrences.keys():
+                        self.occurrences[t] += 1
                     else:
-                        occurrences[stem_t.lower()] = 1
-                        tokens.append(stem_t)
+                        self.occurrences[t] = 1
+                        tokens.append(t)
 
-
-                        
         return tokens      
 
     # this function will aid in clean-up of tokens by removing any non-alphanumeric characters
@@ -158,21 +161,28 @@ class Index():
         for i, text in enumerate(tokens):
             # first combinate any contractions by removing apostrophes
             p = re.compile('[’\']')
-            tokens[i] = p.sub('', text)
+            tokens[i] = p.sub('', tokens[i])
 
             # then replace any character that isn't a number or letter with a space
             p = re.compile('[^a-zA-Z0-9]')
             tokens[i] = p.sub(' ', tokens[i])
             
+            p = re.compile(' +')
             # lastly, remove any remaining extra spaces
-            tokens[i] = re.sub(' +', ' ', tokens[i])
+            tokens[i] = p.sub(' ', tokens[i])
 
             # remove any leading and trailing spaces
             tokens[i] = tokens[i].strip()
 
-            # remove any empty tokens
-            if len(tokens[i]) == 0:
-                tokens.remove(tokens[i])
+        # delete empty tokens
+        tokens = list(filter(None, tokens))
+
+        # TESTING:
+        for token in tokens:
+            for char in token:
+                if not (char.isalnum() or char == ' '):
+                    print('ERROR:', token)
+                    break
 
         return tokens
 
