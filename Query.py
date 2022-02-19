@@ -20,6 +20,7 @@ class Query():
 
         for token in tokens:
             self.tokens_list.append(ps.stem(token))
+        print(self.tokens_list)
         #print(self.tokens_list)
 
     #this function will go through the index and retrieve the relevant 
@@ -32,10 +33,13 @@ class Query():
                 #checks to see if the token is in that line 
                 for token in self.tokens_list:
                     #If the token is in the line find its elements
-                    if token in line:
+                    #print(token)
+                    #if token in line:
+                    if token  + '\t' == line[0:len(token) + 1]:
                         doc_ids = self.parse_line(line)
                         self.token_documents.update({token: doc_ids})
-                        
+                        break
+    
     
     #this function will parse the line of the file to get the 
     #doc ids from the line
