@@ -3,9 +3,9 @@ from Indexer import Index
 from nltk.stem import PorterStemmer
 class Query():
 
-    def __init__(self, index:Index):
-        self.index = index
+    def __init__(self):
         self.tokens_list = []
+        self.token_documents = {}
         
 
     #This function will read in the input and tokenize the input for retrieval
@@ -24,16 +24,33 @@ class Query():
 
     #this function will go through the index and retrieve the relevant 
     #documents releated to the query
-    #the majority of milestone 2 will probably be involved here(might need more functions to help the processing)
-    # returns a list of the relevent documents to compare
+    #Might need need to call more than once with multiple files 
     def retrieve_relevant_document(self, file_name):
         with open(file_name, 'r') as file:
+            #Goes through the file line by line 
             for line in file:
+                #checks to see if the token is in that line 
                 for token in self.tokens_list:
+                    #If the token is in the line find its elements
                     if token in line:
-                        pass
+                        doc_ids = self.parse_line(line)
+                        self.token_documents.update({token: doc_ids})
+                        
     
     #this function will parse the line of the file to get the 
-    def parse_line(self):
-        pass
+    #doc ids from the line
+    def parse_line(self, line:string):
+        tokens = line.split()
+        doc_id = []
+        #Gets the numbers of the ids that relate to the tokem 
+        for token in tokens:
+            if token.isdigit():
+                doc_id.append(token)
+        return doc_id
+
+    #test function
+    def print_id(self):
+        print(self.token_documents)
+        
+
         
