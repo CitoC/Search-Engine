@@ -12,7 +12,6 @@ class Index():
         self.current_id = 1         # increment each time after an id is associated with a document
         self.token_posting = {}          # associate each token with the document where it appears, e.g. {"anteater": [1], "zot": [1,4]}
         self.tokens = []
-        self.occurrences = {}
         self.file_num = 0
 
 
@@ -54,6 +53,7 @@ class Index():
     # within less important tags, such as <p> and <li>
     def tokenize(self, content: str) -> list:
         tokens = []
+        occurrences = {}
 
         # create a BS object to parse content attribute from JSON file
         soup = BeautifulSoup(content, "html.parser")
@@ -63,11 +63,11 @@ class Index():
         relevant_tags = ['p', 'li']
         
         #Turns the returned sets into lists to process them
-        tokens.append(self.parse_tags(soup, important_tags))
-        tokens.append(self.parse_tags(soup, relevant_tags))
+        tokens.append(self.parse_tags(soup, important_tags, occurrences))
+        tokens.append(self.parse_tags(soup, relevant_tags, occurrences))
 
         # print(self.occurrences)
-        return tokens
+        return tokens, occurrences
 
 
     # this function takes a list to token and stem them, i.e., turns the tokens into their simplest form
@@ -83,16 +83,16 @@ class Index():
     
     # create posting for the token
     # example, {“anteater”: [(1,3),(5,2)], “zot”: [(3,6)]}
-    def create_posting(self, stem_list: list):
+    def create_posting(self, stem_list: list, occurences: dict):
             id = self.current_id - 1
             print("INSIDE CREATE_POSTING: " + str(id))
             for i,stem_t in enumerate(stem_list):
                 # if stemmed token already in token_posting
                 if stem_t in self.token_posting:
                     print("here!!!!!!!!!!!!!!!!!!!!!!!!!!!")
-                    self.token_posting[stem_t].append(tuple([id, self.occurrences]))     # subtracting 1 is needed to get the correct document id, since curren_id is incremented by 1 in assign_ID
+                    self.token_posting[stem_t].append(tuple([id, occurences[stem_t]]))     # subtracting 1 is needed to get the correct document id, since curren_id is incremented by 1 in assign_ID
                 else:
-                    self.token_posting[stem_t] = [tuple([id, self.occurrences[stem_t]])]
+                    self.token_posting[stem_t] = [tuple([id, occurences[stem_t]])]
 
 
     def create_index(self):
@@ -110,7 +110,7 @@ class Index():
         # empty 
         self.token_id = {}
 
-    def parse_tags(self, soup: BeautifulSoup, tag_list: list) -> set:
+    def parse_tags(self, soup: BeautifulSoup, tag_list: list, occurrences: dict) -> set:
         tokens = []
 
         for tag in tag_list:
@@ -143,11 +143,13 @@ class Index():
                 for t in temp_tokens:
                     # either add a new token to the list, or increment its counter
                     stem_t = ps.stem(t)
-                    if stem_t in self.occurrences.keys():
-                        self.occurrences[stem_t.lower()] += 1
+                    if stem_t.lower() in occurrences.keys():
+                        occurrences[stem_t.lower()] += 1
                     else:
-                        self.occurrences[stem_t.lower()] = 1
-                        tokens.append(t)
+                        occurrences[stem_t.lower()] = 1
+                        tokens.append(stem_t)
+
+
                         
         return tokens      
 
