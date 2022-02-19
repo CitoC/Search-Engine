@@ -15,7 +15,6 @@ class Index():
         self.file_num = 0
         self.occurrences = {}
 
-
     # this function expects the name of a file as a string. it will attempt to open the file and 
     # use the json library to extract the content attribute from the json file. Lastly, it will
     # send the content of the file as a string to the tokenize function to have it return the list 
@@ -86,7 +85,6 @@ class Index():
     # example, {“anteater”: [(1,3),(5,2)], “zot”: [(3,6)]}
     def create_posting(self, token_list: list):
             id = self.current_id - 1
-            print("INSIDE CREATE_POSTING: " + str(id))
             # REMINDER: mixing important list and normal list. Fix later
             for l in token_list:
                 for token in l:
@@ -96,21 +94,20 @@ class Index():
                     else:
                         self.token_posting[token] = [tuple([id, self.occurrences[token]])]
 
-
     def create_index(self) -> str:
         tName = './indexes/index'
         fName = '%s%d.txt' % (tName, self.file_num)
         with open(fName, 'w', encoding='utf-8') as file:
-            for token in self.token_id:
+            for token in self.token_posting.keys():
                 file.write(token + '\t')                # print the key
-                for id in self.token_id[token]:         # print postings
-                    file.write(str(id) + ' ')
+                for item in self.token_posting[token]:
+                    file.write('(' + str(item[0]) + ',' + str(item[1]) + ') ')
                 file.write('\n')
         
         # increment file number
         self.file_num += 1
         # empty 
-        self.token_id = {}
+        self.token_posting = {}
 
         # return the file name for sorting of file
         return fName
@@ -176,13 +173,6 @@ class Index():
 
         # delete empty tokens
         tokens = list(filter(None, tokens))
-
-        # TESTING:
-        for token in tokens:
-            for char in token:
-                if not (char.isalnum() or char == ' '):
-                    print('ERROR:', token)
-                    break
 
         return tokens
 
