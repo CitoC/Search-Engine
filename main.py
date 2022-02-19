@@ -36,11 +36,10 @@ def handle_ram_threshold(previous_memory_usage: float, threshold_offset: int, in
 
     return previous_memory_usage
 
+
 def run():
     index = Index()
-    directory = 'DEV'
-    threshold_offset = 10
-    previous_memory_usage = psutil.virtual_memory()[2]
+    directory = 'testdir'
 
     #Gets all of the folders in the Dev folder
     #This will extract the data from the Dev folder containing all the content we will look at. 
@@ -50,20 +49,14 @@ def run():
             print(strfile.path)
             #we will then extract the json content here
             for file in files:
-                # print(file)
-                #call extract content on the json here. 
+                print(file)
                 path_of_json = strfile.path + '/' + file
                 # indexing starts here
                 token_list = index.extract_content(path_of_json)
-                stem_list = index.stem(token_list)
-                index.create_pair(stem_list)
-            
-                # check to see if we've hit the ram usage threshold, if so, create an offload a partial index
-                previous_memory_usage = handle_ram_threshold(previous_memory_usage, threshold_offset, index, token_list, stem_list)
-           
-    # create one last index by passing in a value that guarantees that the condition for creating a 
-    # partial index is met
-    handle_ram_threshold(-threshold_offset)
-
+                index.create_posting(token_list)
+                del token_list
+        
+        
 if __name__ == '__main__':
     run()
+
