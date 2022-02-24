@@ -57,7 +57,7 @@ def run():
 
                 # after each file, check if the RAM threshold has been reached
                 #handle_ram_threshold(previous_memory_usage, threshold_offset, index, token_list)
-            handle_ram_threshold(previous_memory_usage, -threshold_offset, index, token_list)  
+            handle_ram_threshold(previous_memory_usage, threshold_offset, index, token_list)  
 
     handle_ram_threshold(previous_memory_usage, -threshold_offset, index, token_list)       
         
