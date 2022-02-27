@@ -176,27 +176,8 @@ class Index():
 
         return tokens
 
-    #This function will read in the input and tokenize the input for retrieval
-    #of the document in the index
-    #Only need to test the querys (cristina lopes, machine learning, ACM, master of software engineering)
-    def get_input(self, input:string):
-        pass
-
-    #this function will go through the index and retrieve the relevant 
-    #documents releated to the query
-    #the majority of milestone 2 will probably be involved here(might need more functions to help the processing)
-    # returns a list of the relevent documents to compare
-    def retrieve_relevant_document(self):
-        pass
-
-    #this function will load in one of the index files into the index in memory
-    def load_index_from_file(self):
-        pass
-
-    #this function will clear the index
-    def clear_index(self):
-        pass
-    
-    #this function will output the most relevant document to the console
-    def output_document(self):
-        pass
+    #this function will return the len of how many doc_ids
+    #were found
+    def get_num_of_doc_ids(self):
+        return len(self.doc_id)
+  
