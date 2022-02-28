@@ -30,7 +30,7 @@ def main():
 
         for i in range(5):
             # print(sorted_intersections[i], end=' ')
-            print(document_urls[int(sorted_intersections[i])])
+            print(test.doc_id[int(sorted_intersections[i])])
         print('')
 
         del test
