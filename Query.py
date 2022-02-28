@@ -11,6 +11,7 @@ class Query():
         self.doc_id = {}
         self.total_number_of_documents = 0
         self.token_tf_idf = {}
+        
 
     #This function will read in the input and tokenize the input for retrieval
     #of the document in the index
@@ -235,4 +236,5 @@ class Query():
         #gets the highest if_idf score and sorts them
         highest_if_id = sorted(highest_if, key=highest_if.get)
         return highest_if_id
+
 
