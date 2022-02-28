@@ -13,55 +13,52 @@ class Query():
         self.token_tf_idf = {}
         
 
-    #This function will read in the input and tokenize the input for retrieval
-    #of the document in the index
-    #Only need to test the querys (cristina lopes, machine learning, ACM, master of software engineering)
+    # This function will read in the input and tokenize the input for retrieval
+    # of the document in the index
+    # Only need to test the querys (cristina lopes, machine learning, ACM, master of software engineering)
     def get_input(self):
-        #will split by white space to see get the tokens of the query that must be processed
-        #should be simple for the queries for milestone 2 will need changes later on
+        # will split by white space to see get the tokens of the query that must be processed
+        # should be simple for the queries for milestone 2 will need changes later on
         query = input("Search: ")
         tokens =  query.split()
         ps = PorterStemmer()
 
         for token in tokens:
             self.tokens_list.append(ps.stem(token))
-        # print(self.tokens_list)
-        return query
-        #print(self.tokens_list)
 
-    #this function will go through the index and retrieve the relevant 
-    #documents releated to the query
-    #Might need need to call more than once with multiple files 
+        return query
+
+    # this function will go through the index and retrieve the relevant 
+    # documents releated to the query
+    # Might need need to call more than once with multiple files 
     def retrieve_relevant_document(self, file_name):
-        #count the number of lines here for  total number of documnets
+        # count the number of lines here for  total number of documnets
         with open(file_name, 'r') as file:
             #Goes through the file line by line 
             for line in file:
-
-            
-                #checks to see if the token is in that line 
+                # checks to see if the token is in that line 
                 for token in self.tokens_list:
-                    #If the token is in the line find its elements
-                    #print(token)
-                    #if token in line:
+                    # If the token is in the line find its elements
+                    # print(token)
+                    # if token in line:
                     if token  + '\t' == line[0:len(token) + 1]:
                         doc_ids, token_occurrences = self.parse_line(line)
                         self.token_documents.update({token: doc_ids})
                         self.token_frequencies.update({token: token_occurrences})
 
                         for i, doc_id in enumerate(doc_ids):
-                            #Calculates the tf-idf score of the token at the document_id and occurence 
+                            # Calculates the tf-idf score of the token at the document_id and occurence 
                             tf_idf_score = float(token_occurrences[i]) / math.log(self.get_total_documents() / len(self.token_documents[token]) )
 
-                            #Checks to see if the token is already present in the token_tf_idf map
+                            # Checks to see if the token is already present in the token_tf_idf map
                             if token in self.token_tf_idf.keys():
-                                #Gets old doc_id and its tf_idf score and updates it with a new doc_id and its tf_idf score
+                                # Gets old doc_id and its tf_idf score and updates it with a new doc_id and its tf_idf score
                                 old_data = self.token_tf_idf[token]
                                 old_data.update({doc_id: tf_idf_score})
-                                #updates the tokens doc_ids and all of its tf_idf scores
+                                # updates the tokens doc_ids and all of its tf_idf scores
                                 self.token_tf_idf.update({token: old_data})
                             else:
-                                #Adds the first doc_id and its score to the token 
+                                # Adds the first doc_id and its score to the token 
                                 self.token_tf_idf.update({token: {doc_id: tf_idf_score}})
                            
                         
