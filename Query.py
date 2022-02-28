@@ -192,6 +192,7 @@ class Query():
 
         return return_list
 
+
     def get_doc_url(self, path):
         with open(path, 'r', encoding='utf-8') as file:
             while True:
@@ -202,6 +203,7 @@ class Query():
                 k,v = line.split(':', 1)
                 v = v.replace('\n','')
                 self.doc_id.update({k: v}) 
+
     #final version not yet
     # def get_total_documents(self, index:Index) -> int:
     #     return index.get_num_of_doc_ids()
