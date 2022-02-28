@@ -84,15 +84,15 @@ class Index():
     # create posting for the token
     # example, {“anteater”: [(1,3),(5,2)], “zot”: [(3,6)]}
     def create_posting(self, token_list: list):
-            id = self.current_id - 1
-            # REMINDER: mixing important list and normal list. Fix later
-            for l in token_list:
-                for token in l:
-                    # if token is already in the posting
-                    if token in self.token_posting.keys():
-                        self.token_posting[token].append(tuple([id, self.occurrences[token]])) # subtracting 1 is needed to get the correct document id, since curren_id is incremented by 1 in assign_ID
-                    else:
-                        self.token_posting[token] = [tuple([id, self.occurrences[token]])]
+        id = self.current_id - 1
+        # REMINDER: mixing important list and normal list. Fix later
+        for l in token_list:
+            for token in l:
+                # if token is already in the posting
+                if token in self.token_posting.keys():
+                    self.token_posting[token].append(tuple([id, self.occurrences[token]])) # subtracting 1 is needed to get the correct document id, since curren_id is incremented by 1 in assign_ID
+                else:
+                    self.token_posting[token] = [tuple([id, self.occurrences[token]])]
 
     def create_index(self) -> str:
         tName = './indexes/index'

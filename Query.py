@@ -8,9 +8,9 @@ class Query():
         self.tokens_list = []
         self.token_documents = {}
         self.token_frequencies = {}
+        self.doc_id = {}
         self.total_number_of_documents = 0
         self.token_tf_idf = {}
-        
 
     #This function will read in the input and tokenize the input for retrieval
     #of the document in the index
@@ -191,6 +191,18 @@ class Query():
 
         return return_list
 
+
+    def get_doc_url(self, path):
+        with open(path, 'r', encoding='utf-8') as file:
+            while True:
+                line = file.readline()
+                # if reached end of text file
+                if not line:
+                    break
+                k,v = line.split(':', 1)
+                v = v.replace('\n','')
+                self.doc_id.update({k: v}) 
+
     #final version not yet
     # def get_total_documents(self, index:Index) -> int:
     #     return index.get_num_of_doc_ids()
@@ -223,5 +235,4 @@ class Query():
         #gets the highest if_idf score and sorts them
         highest_if_id = sorted(highest_if, key=highest_if.get)
         return highest_if_id
-
 
