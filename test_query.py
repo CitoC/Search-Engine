@@ -12,8 +12,6 @@ import itertools
 import re
 from nltk.stem import PorterStemmer
 
-
-
 def main():
     test = Query()
     test.get_doc_url('documentIDs.txt')
@@ -30,7 +28,9 @@ def main():
 
         for i in range(5):
             # print(sorted_intersections[i], end=' ')
+
             print(test.doc_id[int(sorted_intersections[i])])
+
         print('')
 
         del test

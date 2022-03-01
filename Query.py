@@ -142,6 +142,7 @@ class Query():
                 if token != self.tokens_list[smallest]:
                     # search each token's list for the same document id
                     
+                    # while (current pointer hasn't reached the end of its respective list AND the current value hasn't gone past the value that we're looking for from the shortest list)
                     while (pointers[i] < len(self.token_documents[token]) and int(self.token_documents[token][pointers[i]]) < int(self.token_documents[self.tokens_list[smallest]][pointers[smallest]])):
                         pointers[i] += 1
                     
