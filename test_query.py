@@ -12,8 +12,6 @@ import itertools
 import re
 from nltk.stem import PorterStemmer
 
-
-
 document_urls = {}
 
 def map_documents():
@@ -39,7 +37,6 @@ def map_documents():
                 document_urls[document_id] = data['url']
                 document_id += 1
 
-
 def main():
     map_documents()
     test = Query()
@@ -55,7 +52,7 @@ def main():
 
         for i in range(5):
             # print(sorted_intersections[i], end=' ')
-            print(document_urls[sorted_intersections[i]])
+            print(document_urls[int(sorted_intersections[i])])
         print('')
 
         del test
