@@ -200,6 +200,7 @@ class Query():
                 k,v = line.split(':', 1)
                 v = v.replace('\n','')
                 self.doc_id.update({k: v}) 
+            return self.doc_id
 
     #final version not yet
     # def get_total_documents(self, index:Index) -> int:
@@ -233,5 +234,3 @@ class Query():
         #gets the highest if_idf score and sorts them
         highest_if_id = sorted(highest_if, key=highest_if.get)
         return highest_if_id
-
-

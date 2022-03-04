@@ -16,22 +16,26 @@ from nltk.stem import PorterStemmer
 
 def main():
     test = Query()
-    test.get_doc_url('documentIDs.txt')
+    # read document ids from disk to memory
+    doc_id = test.get_doc_url('documentIDs.txt')
+
     while True:
         user_input = test.get_input()
-        if user_input == '-1': break
+        if user_input == '-1': break # stop condition
 
-        test.retrieve_relevant_document('/Users/joshuamontellano/Desktop/cs121/Search-Engine/indexes/index83.txt')
+        test.retrieve_relevant_document('indexes/index83.txt')
         # test.print_id()
         #intersections = test.find_intersection()
 
         sorted_intersections = test.highest_tf_idf_scores()
         #sorted_intersections = test.rank_urls(intersections)
 
-        for i in range(5):
-            # print(sorted_intersections[i], end=' ')
-            print(test.doc_id[int(sorted_intersections[i])])
-        print('')
+        try:
+            for i in range(5):
+                print(doc_id[sorted_intersections[i]])
+            print('')
+        except:
+            print("Too bad, what you are finding does not exist in the Corpus!")
 
         del test
         test = Query()
