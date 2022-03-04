@@ -3,6 +3,8 @@ import time
 
 def main():
     test = Query()
+    doc_id = get_doc_url('documentsIDs.txt')
+    
     while True:
         test.get_doc_url('documentIDs.txt')
         
@@ -16,7 +18,7 @@ def main():
         sorted_intersections = test.highest_tf_idf_scores()
 
         for i in range(5):
-            print(test.doc_id[sorted_intersections[i]])
+            print(doc_id[sorted_intersections[i]])
 
         elapsed_time = round((time.process_time() - t) * 1000)
         print('elapsed time:', elapsed_time, 'milliseconds\n')
