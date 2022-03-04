@@ -1,8 +1,6 @@
 import json
-from lib2to3.pgen2 import token
 import string
 from bs4 import BeautifulSoup
-import itertools
 import re
 from nltk.stem import PorterStemmer
 import glob
@@ -17,7 +15,6 @@ class Index():
         self.tokens = []
         self.file_num = 0
         self.occurrences = {}
-
 
     # this function expects the name of a file as a string. it will attempt to open the file and 
     # use the json library to extract the content attribute from the json file. Lastly, it will
@@ -39,7 +36,6 @@ class Index():
         # return a list of words including stop words
         return self.tokenize(data['content'])
 
-
     # This function is called by extract_content() only. It will assign the url to a unique id.
     # The key/value pair is then added to doc_id dictionary.
     # example, {"https://ics.uci.edu": 1}
@@ -54,7 +50,6 @@ class Index():
             # Updates the current id
             self.current_id = self.current_id + 1 
        
-
     # this function uses BeautifulSoup to parse the content attribute of the JSON file.
     # this function will return a 2D list of tokens; element 0 will contain a list of phrases
     # that are considered important text and element 1 will contain individual words found
@@ -77,13 +72,11 @@ class Index():
         # print(self.occurrences)
         return tokens
 
-
     # create posting for the token
     # example, {“anteater”: [(1,3),(5,2)], “zot”: [(3,6)]}
     def create_posting(self, token_list: list):
         id = self.current_id - 1 # subtracting 1 is needed to get the correct document id, since curren_id is incremented by 1 in assign_ID before this function is called
 
-        # REMINDER: mixing important list and normal list. Fix later
         for l in token_list: # for each list
             for token in l: # for each token
                 # if token is already in the posting
@@ -91,7 +84,6 @@ class Index():
                     self.token_posting[token].append(tuple([id, self.occurrences[token]]))
                 else:
                     self.token_posting[token] = [tuple([id, self.occurrences[token]])]
-
 
     # This function creates the inverse index file and writes to the disk from the memory.
     # It will also empty the memory before the next iteration is called.
@@ -163,7 +155,6 @@ class Index():
 
         return tokens      
 
-
     # This function will aid in clean-up of tokens by removing any non-alphanumeric characters
     def token_clean_up(self, tokens):
         for i, text in enumerate(tokens):
@@ -224,7 +215,6 @@ class Index():
                 while first_index < len(lines) and not lines[first_index]:
                     first_index += 1
                 
-
                 # determine which line's token comes first (alphabetically)
                 for i, line in enumerate(lines):
                     # always compare the current line with the previous first line (alphabetically)
@@ -270,6 +260,7 @@ class Index():
                     
                     f_output.write(token + '\t')
                     i = 0
+
                     # these nested loops use a 2 pointer approach to find all matching
                     # doc ids and sum their frequencies for merging into a single pair
                     while i < len(doc_ids):
@@ -325,7 +316,7 @@ class Index():
         tokens = line.split()
         doc_id = []
         token_occurrences = []
-        #Gets the numbers of the ids that relate to the tokem 
+        #Gets the numbers of the ids that relate to the token
         
         start_of_doc_ids = 0
 
@@ -352,32 +343,6 @@ class Index():
 
         return doc_id, token_occurrences
 
-
-    #This function will read in the input and tokenize the input for retrieval
-    #of the document in the index
-    #Only need to test the querys (cristina lopes, machine learning, ACM, master of software engineering)
-    def get_input(self, input:str):
-        pass
-
-    #this function will go through the index and retrieve the relevant 
-    #documents releated to the query
-    #the majority of milestone 2 will probably be involved here(might need more functions to help the processing)
-    # returns a list of the relevent documents to compare
-    def retrieve_relevant_document(self):
-        pass
-
-    #this function will load in one of the index files into the index in memory
-    def load_index_from_file(self):
-        pass
-
-    #this function will clear the index
-    def clear_index(self):
-        pass
-    
-    #this function will output the most relevant document to the console
-    def output_document(self):
-        pass
-      
     # This function will return the len of how many doc_ids were found.
     def get_num_of_doc_ids(self):
         return len(self.doc_id)
