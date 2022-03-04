@@ -1,6 +1,7 @@
 import string
 from nltk.stem import PorterStemmer
 import math
+from collections import OrderedDict
 
 class Query():
     def __init__(self):
@@ -10,52 +11,92 @@ class Query():
         self.doc_id = {}
         self.total_number_of_documents = 0
         self.token_tf_idf = {}
+        self.table_of_contents = {}
         
     # This function will read in the input and tokenize the input for retrieval
     # of the document in the index
     def get_input(self):
+        self.tokens_list = []
+        self.token_documents = {}
+        self.token_frequencies = {}
+        self.token_tf_idf = {}
+
         # will split by white space to see get the tokens of the query that must be processed
         # should be simple for the queries for milestone 2 will need changes later on
-        query = input("Search: ")
+        query = '' 
+        while not query:
+            query = input("Search: ")
+            query = query.strip()
+            tokens = query.split()
+            for i in tokens:
+                if not i.isalnum():
+                    print('Alphanumeric characters only!')
+                    query = ''
+                    break
+
         tokens =  query.split()
         ps = PorterStemmer()
 
+        # clear the previous tokens
+        self.tokens_list = []
+
         for token in tokens:
             self.tokens_list.append(ps.stem(token))
+
+        self.tokens_list = list(OrderedDict.fromkeys(self.tokens_list))
         
         return query
 
     # this function will go through the index and retrieve the relevant 
     # documents releated to the query
     def retrieve_relevant_document(self, file_name):
+        if not self.tokens_list:
+            return
+
+        # sort the list of tokens
+        self.tokens_list = sorted(self.tokens_list)
+
         # count the number of lines here for  total number of documnets
         with open(file_name, 'r') as file:
+            # use the table of contents to seek to the proper letter
+            ptr = 0
+            file.seek(self.table_of_contents[self.tokens_list[ptr][0]])
+            line = file.readline()
             # Goes through the file line by line 
-            for line in file:
-
+            while line and ptr < len(self.tokens_list):
                 #checks to see if the token is in that line 
-                for token in self.tokens_list:
-                    # If the token is in the line find its elements
-                    if token  + '\t' == line[0:len(token) + 1]:
-                        doc_ids, token_occurrences = self.parse_line(line)
-                        self.token_documents.update({token: doc_ids})
-                        self.token_frequencies.update({token: token_occurrences})
+                # If the token is in the line find its elements
+                if self.tokens_list[ptr]  + '\t' == line[0:len(self.tokens_list[ptr]) + 1]:
+                    doc_ids, token_occurrences = self.parse_line(line)
+                    self.token_documents.update({self.tokens_list[ptr]: doc_ids})
+                    self.token_frequencies.update({self.tokens_list[ptr]: token_occurrences})
 
-                        for i, doc_id in enumerate(doc_ids):
-                            # Calculates the tf-idf score of the token at the document_id and occurence 
-                            tf_idf_score = float(token_occurrences[i]) / math.log(len(self.doc_id) / len(self.token_documents[token]) )
+                    for i, doc_id in enumerate(doc_ids):
+                        # Calculates the tf-idf score of the token at the document_id and occurence 
+                        tf_idf_score = (1 + math.log(float(token_occurrences[i]))) * math.log(len(self.doc_id) / len(self.token_documents[self.tokens_list[ptr]]) )
 
-                            # Checks to see if the token is already present in the token_tf_idf map
-                            if token in self.token_tf_idf.keys():
-                                #Gets old doc_id and its tf_idf score and updates it with a new doc_id and its tf_idf score
-                                old_data = self.token_tf_idf[token]
-                                old_data.update({doc_id: tf_idf_score})
-                                # updates the tokens doc_ids and all of its tf_idf scores
-                                self.token_tf_idf.update({token: old_data})
-                            else:
-                                # Adds the first doc_id and its score to the token 
-                                self.token_tf_idf.update({token: {doc_id: tf_idf_score}})
-                        break
+                        # Checks to see if the token is already present in the token_tf_idf map
+                        if self.tokens_list[ptr] in self.token_tf_idf.keys():
+                            #Gets old doc_id and its tf_idf score and updates it with a new doc_id and its tf_idf score
+                            old_data = self.token_tf_idf[self.tokens_list[ptr]]
+                            old_data.update({doc_id: tf_idf_score})
+                            # updates the tokens doc_ids and all of its tf_idf scores
+                            self.token_tf_idf.update({self.tokens_list[ptr]: old_data})
+                        else:
+                            # Adds the first doc_id and its score to the token 
+                            self.token_tf_idf.update({self.tokens_list[ptr]: {doc_id: tf_idf_score}})
+
+                    # move to the next token
+                    ptr += 1
+                    if ptr >= len(self.tokens_list): break
+                    file.seek(self.table_of_contents[self.tokens_list[ptr][0]])
+
+                # if the first letter of the token comes before the first letter of the current line
+                elif self.tokens_list[ptr][0] < line[0]:
+                    ptr += 1
+                    if ptr >= len(self.tokens_list): break
+
+                line = file.readline()
     
     # this function will parse the line of the file to get the 
     # doc ids from the line
@@ -135,12 +176,8 @@ class Query():
             if document_id_shared:
                 intersections.append(self.token_documents[self.tokens_list[smallest]][pointers[smallest]])
 
-                # move over all of our pointers to their respective next document ids
-                for i, _ in enumerate(pointers):
-                    pointers[i] += 1
-            else:
-                # increment the shortest pointer
-                pointers[smallest] += 1
+            # increment the shortest pointer
+            pointers[smallest] += 1
         
         return intersections
 
@@ -205,8 +242,21 @@ class Query():
         highest_if_id = sorted(highest_if, key=highest_if.get)
         return highest_if_id
 
-    # def get_total_documents(self, file: str) -> int:
-    #     with open(file, 'r') as fp:
-    #         for count, line in enumerate(fp):
-    #             pass
-    #     self.total_number_of_documents =  count + 1
+    def create_table_of_contents(self) -> None:
+        headers = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', \
+            'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', \
+                'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z']
+
+        with open('indexes/index.txt', 'r') as file:
+            # Read in the file once and build a list of line offsets
+            offset = 0
+            ptr = 0
+            for line in file:
+                # if the first line with the current char that the ptr is pointing
+                # to, add the current offset to the map
+                if line[0] == headers[ptr]:
+                    self.table_of_contents[headers[ptr]] = offset
+                    ptr += 1
+                    if ptr >= len(headers): break
+
+                offset += len(line)

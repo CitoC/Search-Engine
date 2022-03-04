@@ -24,27 +24,27 @@ def create_partial_index(folder_count:int, index: Index, token_list: list) -> No
 
 def main():
     index = Index()
-    # directory = 'DEV'
-    # folder_count = 0
+    directory = 'DEV'
+    folder_count = 0
 
-    # #Gets all of the folders in the Dev folder
-    # #This will extract the data from the Dev folder containing all the content we will look at. 
-    # for strfile in os.scandir(directory):
-    #     #for each of the folders we will then go through them to get the json files
-    #     for _, _, files in os.walk(strfile.path):
-    #         folder_count += 1
+    #Gets all of the folders in the Dev folder
+    #This will extract the data from the Dev folder containing all the content we will look at. 
+    for strfile in os.scandir(directory):
+        #for each of the folders we will then go through them to get the json files
+        for _, _, files in os.walk(strfile.path):
+            folder_count += 1
             
-    #         #we will then extract the json content here
-    #         for file in files:
-    #             path_of_json = strfile.path + '/' + file
-    #             print(path_of_json)
-    #             # indexing starts here
-    #             token_list = index.extract_content(path_of_json)
-    #             index.create_posting(token_list)
+            #we will then extract the json content here
+            for file in files:
+                path_of_json = strfile.path + '/' + file
+                print(path_of_json)
+                # indexing starts here
+                token_list = index.extract_content(path_of_json)
+                index.create_posting(token_list)
 
-    #         create_partial_index(folder_count, index, token_list)  
+            create_partial_index(folder_count, index, token_list)  
 
-    # create_partial_index(30, index, token_list)       
+    create_partial_index(30, index, token_list)       
     index.merge_partial_indexes()
         
 if __name__ == '__main__': main()

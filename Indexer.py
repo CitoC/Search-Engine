@@ -75,15 +75,38 @@ class Index():
     # create posting for the token
     # example, {“anteater”: [(1,3),(5,2)], “zot”: [(3,6)]}
     def create_posting(self, token_list: list):
+        ps = PorterStemmer()
         id = self.current_id - 1 # subtracting 1 is needed to get the correct document id, since curren_id is incremented by 1 in assign_ID before this function is called
 
-        for l in token_list: # for each list
+        for i, l in enumerate(token_list): # for each list
             for token in l: # for each token
-                # if token is already in the posting
-                if token in self.token_posting.keys():
-                    self.token_posting[token].append(tuple([id, self.occurrences[token]]))
+                # for important words
+                if i == 0:
+                    # split the tokens in the important words phrase
+                    tokens = token.split()                   
+                    
+                    # stem each of the individual tokens
+                    for t in tokens:
+                        t = ps.stem(t)
+                        
+                        # update occurrences for new tokens
+                        if t in self.occurrences.keys():
+                            self.occurrences[t] += 1
+                        else:
+                            self.occurrences[t] = 1
+
+                        # if token is already in the posting
+                        if t in self.token_posting.keys():
+                            self.token_posting[t].append(tuple([id, self.occurrences[t]+10 ]))
+                        else:
+                            self.token_posting[t] = [tuple([id, self.occurrences[t]+10 ])]
+                # for non-important words
                 else:
-                    self.token_posting[token] = [tuple([id, self.occurrences[token]])]
+                    # if token is already in the posting
+                    if token in self.token_posting.keys():
+                        self.token_posting[token].append(tuple([id, self.occurrences[token]]))
+                    else:
+                        self.token_posting[token] = [tuple([id, self.occurrences[token]])]
 
     # This function creates the inverse index file and writes to the disk from the memory.
     # It will also empty the memory before the next iteration is called.
