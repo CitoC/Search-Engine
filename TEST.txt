@@ -1,0 +1,19 @@
+ranking performance (effectiveness)
+1. machine learning machine - remove duplicate tokens
+2. masters of software engineering
+3. cristina lopes
+4. acm
+5. stats
+6. data
+7. dataset
+8. chancellor howard gillman
+9. 
+
+runtime performance (efficiency)
+1. here is a sentence with a ton of words
+2. research - implemented an index of index (table of contents)
+3. department of information computer science
+4. donald bren school of information computer science
+5. university of california irvine
+6. mit
+7. lord of the rings

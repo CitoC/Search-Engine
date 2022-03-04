@@ -3,33 +3,34 @@ import time
 
 def main():
     test = Query()
-    test.get_doc_url('documentsIDs.txt')
-    
+    test.get_doc_url('documentIDs.txt')
+    # populate the offset map
+    # i.e., index the index
+    test.create_table_of_contents()
+
     while True:
-        
-        # get the start time (to determine running time of searches)
+        # start the timer
         t = time.process_time()
 
-        # prompt user to enter a search term
+        # get user input, and check if we need to terminate the program
         user_input = test.get_input()
         if user_input == '-1': break
 
-        # read relevant data from index file from disk into memory
+        # retrieve the relevant documents for the current qu5ery
         test.retrieve_relevant_document('indexes/index.txt')
 
-        # calculate document rankings
+        # find all of the results, sorted by rank
         sorted_intersections = test.highest_tf_idf_scores()
 
-        # get top 5 search results
+        # print the results in order
         for i in range(5):
+            # ensure we don't go out of bounds for results
+            if i >= len(sorted_intersections): break
             print(test.doc_id[sorted_intersections[i]])
 
-        # calculate elasped time for search
+        # calculate the total time for the query, and print in ms
+
         elapsed_time = round((time.process_time() - t) * 1000)
         print('elapsed time:', elapsed_time, 'milliseconds\n')
-        
-
-        del test
-        test = Query()
 
 if __name__ == '__main__': main()
