@@ -204,9 +204,3 @@ class Query():
         #gets the highest if_idf score and sorts them
         highest_if_id = sorted(highest_if, key=highest_if.get)
         return highest_if_id
-
-    # def get_total_documents(self, file: str) -> int:
-    #     with open(file, 'r') as fp:
-    #         for count, line in enumerate(fp):
-    #             pass
-    #     self.total_number_of_documents =  count + 1
