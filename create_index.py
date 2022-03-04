@@ -33,7 +33,6 @@ def main():
         #for each of the folders we will then go through them to get the json files
         for _, _, files in os.walk(strfile.path):
             folder_count += 1
-            
             #we will then extract the json content here
             for file in files:
                 path_of_json = strfile.path + '/' + file

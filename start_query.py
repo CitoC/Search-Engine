@@ -29,6 +29,7 @@ def main():
             print(test.doc_id[sorted_intersections[i]])
 
         # calculate the total time for the query, and print in ms
+
         elapsed_time = round((time.process_time() - t) * 1000)
         print('elapsed time:', elapsed_time, 'milliseconds\n')
 

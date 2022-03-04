@@ -215,7 +215,8 @@ class Query():
                     break
                 k,v = line.split(':', 1)
                 v = v.replace('\n','')
-                self.doc_id.update({k: v}) 
+                self.doc_id.update({k: v})
+            return self.doc_id
 
     # This function will get the highest from the intersections and return them sorted. 
     # we calculate the highest td-idf score between the tokens and the intersected doc_ids
@@ -241,7 +242,7 @@ class Query():
         #gets the highest if_idf score and sorts them
         highest_if_id = sorted(highest_if, key=highest_if.get)
         return highest_if_id
-
+      
     def create_table_of_contents(self) -> None:
         headers = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', \
             'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', \
