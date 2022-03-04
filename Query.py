@@ -178,7 +178,8 @@ class Query():
                     break
                 k,v = line.split(':', 1)
                 v = v.replace('\n','')
-                self.doc_id.update({k: v}) 
+                self.doc_id.update({k: v})
+            return self.doc_id
 
     # This function will get the highest from the intersections and return them sorted. 
     # we calculate the highest td-idf score between the tokens and the intersected doc_ids
