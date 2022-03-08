@@ -15,11 +15,12 @@ def run_query(window: Tk, test: Query, data: str):
     # find all of the results, sorted by rank
     sorted_intersections = test.highest_tf_idf_scores()
 
-    # top 5 results
+    # destroy previous label
     for i in range(5):
-        # destroy previous label
         if test.links[i] != None: test.links[i].destroy()
 
+    # top 5 results
+    for i in range(5):
         # create label
         test.links[i] = Label(window, font=('Arial',12), fg='blue')
 
