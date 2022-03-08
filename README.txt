@@ -27,4 +27,4 @@ How to run
 Place all json files that you want to include in the corpus in a folder called DEV.
 Run create_index.py to create the index file. The index.txt will appear in the current directory.
 Run idURL.py to create the document ids file. The documentIDs.txt will appear in the current directory.
-Run start_query.py to start the search. The user will be prompt to enter a search term until -1 is entered.
+Run start_query.py to start the search. A GUI will appear for the user to do the searches.
