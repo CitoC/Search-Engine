@@ -1,6 +1,10 @@
 from Query import Query
 import time
 from tkinter import *
+import webbrowser
+
+def open_url(url):
+    webbrowser.open_new_tab(url)
 
 def run_query(window: Tk, test: Query, data: str):
     # start the timer
@@ -19,13 +23,18 @@ def run_query(window: Tk, test: Query, data: str):
     for i in range(5):
         if test.links[i] != None: test.links[i].destroy()
 
+    sites = [None] * 5
     # top 5 results
     for i in range(5):
         # create label
         test.links[i] = Label(window, font=('Arial',12), fg='blue')
 
+
         # ensure we don't go out of bounds for results
         if i >= len(sorted_intersections): break
+
+        # save in sites
+        sites[i] = test.doc_id[sorted_intersections[i]]
 
         # print result in console
         print(test.doc_id[sorted_intersections[i]])
@@ -36,35 +45,36 @@ def run_query(window: Tk, test: Query, data: str):
         test.links[i].config(text=str(test.doc_id[sorted_intersections[i]]))
 
     # Abomination, DO NOT REVIVE
-    # l = len(sorted_intersections)
-    # if l == 1:
-    #     test.links[0].bind('<Button-1>', lambda e: open_url(sites[0]))
-    # elif l == 2: 
-    #     test.links[0].bind('<Button-1>', lambda e: open_url(sites[0]))
-    #     test.links[1].bind('<Button-1>', lambda e: open_url(sites[1]))
-    # elif l == 3:
-    #     test.links[0].bind('<Button-1>', lambda e: open_url(sites[0]))
-    #     test.links[1].bind('<Button-1>', lambda e: open_url(sites[1]))
-    #     test.links[2].bind('<Button-1>', lambda e: open_url(sites[2]))
-    # elif l == 4:
-    #     test.links[0].bind('<Button-1>', lambda e: open_url(sites[0]))
-    #     test.links[1].bind('<Button-1>', lambda e: open_url(sites[1]))
-    #     test.links[2].bind('<Button-1>', lambda e: open_url(sites[2]))
-    #     test.links[3].bind('<Button-1>', lambda e: open_url(sites[3]))
-    # elif l == 5:
-    #     test.links[0].bind('<Button-1>', lambda e: open_url(sites[0]))
-    #     test.links[1].bind('<Button-1>', lambda e: open_url(sites[1]))
-    #     test.links[2].bind('<Button-1>', lambda e: open_url(sites[2]))
-    #     test.links[3].bind('<Button-1>', lambda e: open_url(sites[3]))
-    #     test.links[4].bind('<Button-1>', lambda e: open_url(sites[4]))
+    l = len(sorted_intersections)
+    if l == 1:
+        test.links[0].bind('<Button-1>', lambda e: open_url(sites[0]))
+    elif l == 2: 
+        test.links[0].bind('<Button-1>', lambda e: open_url(sites[0]))
+        test.links[1].bind('<Button-1>', lambda e: open_url(sites[1]))
+    elif l == 3:
+        test.links[0].bind('<Button-1>', lambda e: open_url(sites[0]))
+        test.links[1].bind('<Button-1>', lambda e: open_url(sites[1]))
+        test.links[2].bind('<Button-1>', lambda e: open_url(sites[2]))
+    elif l == 4:
+        test.links[0].bind('<Button-1>', lambda e: open_url(sites[0]))
+        test.links[1].bind('<Button-1>', lambda e: open_url(sites[1]))
+        test.links[2].bind('<Button-1>', lambda e: open_url(sites[2]))
+        test.links[3].bind('<Button-1>', lambda e: open_url(sites[3]))
+    elif l >= 5:
+        test.links[0].bind('<Button-1>', lambda e: open_url(sites[0]))
+        test.links[1].bind('<Button-1>', lambda e: open_url(sites[1]))
+        test.links[2].bind('<Button-1>', lambda e: open_url(sites[2]))
+        test.links[3].bind('<Button-1>', lambda e: open_url(sites[3]))
+        test.links[4].bind('<Button-1>', lambda e: open_url(sites[4]))
 
     # calculate the total time for the query, and print in ms
     elapsed_time = round((time.process_time() - t) * 1000)
     print('elapsed time:', elapsed_time, 'milliseconds\n')
 
-    elapsed_label = Label(window, font=('Arial',12), fg='red')
-    elapsed_label.grid(row = 9, column=1, sticky=W)
-    elapsed_label.config(text='Elapsed time: ' + str(elapsed_time) + 'ms')
+    # elapsed_label = Label(window, font=('Arial',12), fg='red')
+    # elapsed_label.grid(row = 9, column=1, sticky=W)
+    # elapsed_label.config(text='')
+    # elapsed_label.config(text='Elapsed time: ' + str(elapsed_time) + 'ms')
 
 def main():
     test = Query()
