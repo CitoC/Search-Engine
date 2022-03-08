@@ -31,3 +31,5 @@ This Search engine does the following things in order:
     <li>Run <code>idURL.py</code> to create the document ids file. The documentIDs.txt will appear in the current directory.
     <li>Run <code>start_query.py</code> to start the search. A GUI will appear for the user to do the searches.
 </ul>
+
+<img src="GUI.png" alt="Demonstration of GUI"/>
