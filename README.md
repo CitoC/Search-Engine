@@ -22,6 +22,10 @@ This Search engine does the following things in order:
         <ul>
             <li>Beautiful Soup is used for parsing HTML content extrated from the json files.</li>
         </ul>
+    <li>Tkinter - installed via <code>pip install --user -U tk</code></li>
+        <ul>
+            <li>Tkinter is used for the GUI.</li>
+        </ul>
 </ol>
 
 ## How to run
