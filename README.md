@@ -29,5 +29,5 @@ This Search engine does the following things in order:
     <li>Place all json files that you want to include in the corpus in a folder called DEV.
     <li>Run <code>create_index.py</code> to create the index file. The index.txt will appear in the current directory.
     <li>Run <code>idURL.py</code> to create the document ids file. The documentIDs.txt will appear in the current directory.
-    <li>Run <code>start_query.py</code> to start the search. The user will be prompt to enter a search term until <code>-1</code> is entered.
+    <li>Run <code>start_query.py</code> to start the search. A GUI will appear for the user to do the searches.
 </ul>
