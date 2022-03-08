@@ -97,16 +97,28 @@ class Index():
 
                         # if token is already in the posting
                         if t in self.token_posting.keys():
-                            self.token_posting[t].append(tuple([id, self.occurrences[t]+10 ]))
+                            for i in range(0, len(self.token_posting[t]), 2):
+                                if self.token_posting[t][i] == id:
+                                    self.token_posting[t][i+1] += self.occurrences[t] + 10 
+                                    break
+                            else:
+                                self.token_posting[t].extend([ id, self.occurrences[t]+10 ])
+                            # self.token_posting[t].append(tuple([id, self.occurrences[t]+10 ]))
                         else:
-                            self.token_posting[t] = [tuple([id, self.occurrences[t]+10 ])]
+                            self.token_posting[t] = [ id, self.occurrences[t]+10 ]
                 # for non-important words
                 else:
                     # if token is already in the posting
                     if token in self.token_posting.keys():
-                        self.token_posting[token].append(tuple([id, self.occurrences[token]]))
+                        for i in range(0, len(self.token_posting[token]), 2):
+                            if self.token_posting[token][i] == id:
+                                self.token_posting[token][i+1] += self.occurrences[token] 
+                                break
+                        else:
+                            self.token_posting[token].extend([ id, self.occurrences[token] ])
+                        # self.token_posting[token].append(tuple([id, self.occurrences[token]]))
                     else:
-                        self.token_posting[token] = [tuple([id, self.occurrences[token]])]
+                        self.token_posting[token] = [ id, self.occurrences[token] ]
 
     # This function creates the inverse index file and writes to the disk from the memory.
     # It will also empty the memory before the next iteration is called.
@@ -121,8 +133,11 @@ class Index():
         with open(fName, 'w', encoding='utf-8') as file:
             for token in self.token_posting.keys():
                 file.write(token + '\t') # print the key
-                for item in self.token_posting[token]:
-                    file.write('(' + str(item[0]) + ',' + str(item[1]) + ') ') # posting print format 
+                for i, item in enumerate(self.token_posting[token]):
+                    if i % 2 == 0:
+                        file.write('(' + str(item) + ',')
+                    else:
+                        file.write(str(item) + ') ') # posting print format 
                 file.write('\n') # write new line, final result is: 'token'  (1,4)
         
         # increment file number
@@ -279,7 +294,7 @@ class Index():
                             doc_ids.append((doc_id[i], frequency[i]))
 
                     # sort the doc_ids in ascending order
-                    doc_ids = sorted(doc_ids, key = lambda X: X[0])
+                    doc_ids = sorted(doc_ids, key = lambda X: int(X[0]))
                     
                     f_output.write(token + '\t')
                     i = 0
