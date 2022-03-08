@@ -1,19 +1,25 @@
+Explanations on how we improved the query will appear on the right side of the query after the - 
+
 ranking performance (effectiveness)
-1. machine learning machine - remove duplicate tokens
-2. masters of software engineering
+1. machine learning machine - remove duplicate tokens in query
+2. masters of software engineering - implemented an index of index (table of contents)
 3. cristina lopes
 4. acm
 5. stats
 6. data
 7. dataset
-8. chancellor howard gillman
-9. 
+8. chancellor howard gillman chancellor - remove duplicate tokens in query 
+9. jennifer wong ma - more emphasis on important words
+10. john s seberger - more emphasis on important words
 
 runtime performance (efficiency)
-1. here is a sentence with a ton of words
-2. research - implemented an index of index (table of contents)
-3. department of information computer science
-4. donald bren school of information computer science
-5. university of california irvine
+1. here is a sentence with a ton of words - implemented an index of index (table of contents)
+2. research 
+3. department of information computer science - implemented an index of index (table of contents)
+4. donald bren school of information computer science - implemented an index of index (table of contents)
+5. university of california irvine - implemented an index of index (table of contents)
 6. mit
-7. lord of the rings
+7. lord of the rings - implemented an index of index (table of contents)
+8. data science
+9. javascript
+10. hack
