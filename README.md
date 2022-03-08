@@ -34,6 +34,7 @@ This Search engine does the following things in order:
     <li>Run <code>create_index.py</code> to create the index file. The index.txt will appear in the current directory.
     <li>Run <code>idURL.py</code> to create the document ids file. The documentIDs.txt will appear in the current directory.
     <li>Run <code>start_query.py</code> to start the search. A GUI will appear as below for the user to do the searches. Close the window to quit.
+    <li>Links are clickable in the GUI. A new tab with the website will be opened in your default browser.
 </ul>
 
 <img src="GUI.png" alt="Demonstration of GUI"/>
