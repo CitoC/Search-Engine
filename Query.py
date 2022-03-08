@@ -12,10 +12,11 @@ class Query():
         self.total_number_of_documents = 0
         self.token_tf_idf = {}
         self.table_of_contents = {}
+        self.links = [None] * 5
         
     # This function will read in the input and tokenize the input for retrieval
     # of the document in the index
-    def get_input(self):
+    def get_input(self,data):
         self.tokens_list = []
         self.token_documents = {}
         self.token_frequencies = {}
@@ -25,7 +26,7 @@ class Query():
         # should be simple for the queries for milestone 2 will need changes later on
         query = '' 
         while not query:
-            query = input("Search: ")
+            query = data
             query = query.strip()
             tokens = query.split()
             for i in tokens:
