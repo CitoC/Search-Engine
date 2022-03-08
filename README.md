@@ -9,7 +9,7 @@ This Search engine does the following things in order:
     <li>A document id file is also created to help return the urls of the search results.
     <li>For searching, the user will be prompted to enter a search term.
     <li>The search will then return a top 5 urls that matches the search terms.
-    <li>Searches will continue until ther user enter -1.
+    <li>Searches will continute until the user closes the search window GUI.
 </ul>
 
 ## Dependencies
