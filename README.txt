@@ -1,3 +1,7 @@
+Leo Baleon - 81387788
+Joshua Montellano - 80502029
+Arkar Chan - 15146128
+
 # There is better formatted documentation on Github #
 https://github.com/CitoC/Search-Engine/blob/main/README.md
 
